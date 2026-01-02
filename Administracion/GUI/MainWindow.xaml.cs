@@ -1,4 +1,8 @@
-﻿using System.Text;
+﻿using Administracion.Datos;
+using Administracion.MD;
+using Oracle.ManagedDataAccess.Client;
+using System;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -8,8 +12,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Administracion.MD;
-
 
 namespace Administracion.GUI
 {
@@ -24,13 +26,40 @@ namespace Administracion.GUI
 
             try
             {
-                TestConexionMD test = new TestConexionMD();
-                test.ProbarConexion();
-                MessageBox.Show("Conexión exitosa con Oracle");
+                bool ok = TestConexionMD.ProbarConexion();
+
+                if (ok)
+                {
+                    MessageBox.Show("Conexión exitosa con Oracle");
+                }
+                else
+                {
+                    MessageBox.Show("No se pudo conectar a Oracle");
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error de conexión:\n" + ex.Message);
+            }
+        }
+
+
+
+
+
+        private void BtnProbarConexion_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                using (OracleConnection conn = OracleDB.CrearConexion())
+                {
+                    conn.Open();
+                    MessageBox.Show("Conexión exitosa a Oracle 🎉");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
 
@@ -47,6 +76,10 @@ namespace Administracion.GUI
                 // En caso de dar click a opción proveedores, muestra la ventana proveedores
                 case "Proveedores":
                     new Proveedor().Show();
+                    break;
+                // En caso de dar click a opción clientes, muestra la ventana clientes
+                case "Clientes":
+                    new Cliente().Show();
                     break;
             }
         }

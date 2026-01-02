@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Administracion.Datos;
+using Administracion.MD;
+using Oracle.ManagedDataAccess.Client;
+using System;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,7 +12,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Administracion.MD;
 
 namespace Administracion.GUI
 {
@@ -38,6 +40,26 @@ namespace Administracion.GUI
             catch (Exception ex)
             {
                 MessageBox.Show("Error de conexión:\n" + ex.Message);
+            }
+        }
+
+
+
+
+
+        private void BtnProbarConexion_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                using (OracleConnection conn = OracleDB.CrearConexion())
+                {
+                    conn.Open();
+                    MessageBox.Show("Conexión exitosa a Oracle 🎉");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
 

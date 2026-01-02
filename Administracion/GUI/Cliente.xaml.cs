@@ -38,8 +38,14 @@ namespace Administracion.GUI
             }
             catch (Exception ex)
             {
-                MessageBox.Show("No se pudo cargar clientes:\n" + ex.Message);
+                MessageBox.Show(
+                    "ERROR COMPLETO:\n\n" + ex.ToString(),
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
             }
+
         }
 
         private ClienteDP? ClienteSeleccionado()

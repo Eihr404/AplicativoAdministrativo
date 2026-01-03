@@ -82,7 +82,9 @@ namespace Administracion.GUI
                 case "Productos":
                     MainContent.Content = new VentanaProducto();
                     break;
-
+                case "EstandarProduccion":
+                    MainContent.Content = new EstandarProduccion();
+                    break;
             }
         }
     }

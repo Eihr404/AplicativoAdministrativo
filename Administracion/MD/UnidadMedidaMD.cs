@@ -15,7 +15,6 @@ namespace Administracion.MD
         {
             List<UnidadMedidaDP> lista = new List<UnidadMedidaDP>();
 
-            // Usamos la conexión robusta de tu compañero
             using (OracleConnection conn = OracleDB.CrearConexion())
             {
                 string sql = "SELECT UME_CODIGO, UME_DESCRIPCION FROM UNIDAD_MEDIDA ORDER BY UME_CODIGO ASC";

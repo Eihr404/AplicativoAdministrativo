@@ -18,9 +18,9 @@ namespace Administracion.Datos
             string configured = ConfigurationManager.AppSettings["propertiesFile"];
 
             // If configured references the old Path.properties name, map it to Conexion.properties
-            if (!string.IsNullOrEmpty(configured) && configured.IndexOf("Path.properties", StringComparison.OrdinalIgnoreCase) >= 0)
+            if (!string.IsNullOrEmpty(configured) && configured.IndexOf("Paths.properties", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                configured = configured.Replace("Path.properties", "Conexion.properties", StringComparison.OrdinalIgnoreCase);
+                configured = configured.Replace("Path.properties", "Paths.properties", StringComparison.OrdinalIgnoreCase);
             }
 
             // Prepare candidate paths (relative to app base dir)
@@ -28,11 +28,9 @@ namespace Administracion.Datos
             if (!string.IsNullOrWhiteSpace(configured))
                 candidates.Add(configured);
 
-            // Common names/locations to try (project has the file under Datos\Conexion.properties or at app root as Conexion.properties)
-            candidates.Add(Path.Combine("Datos", "Conexion.properties"));
-            candidates.Add("Conexion.properties");
-            candidates.Add(Path.Combine("Datos", "conexion.properties"));
-            candidates.Add("conexion.properties");
+            // Common names/locations to try (project has the file under Datos\Paths.properties or at app root as Conexion.properties)
+            candidates.Add(Path.Combine("Datos", "Paths.properties"));
+            candidates.Add("Paths.properties");
 
             string foundPath = null;
 

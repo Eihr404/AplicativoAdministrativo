@@ -70,30 +70,22 @@ namespace Administracion.GUI
         {
             try
             {
-                // 1. Instanciamos el DP como mensajero
                 MateriaPrimaDP mensajeroDP = new MateriaPrimaDP();
-
-                // 2. Obtenemos el código del TextBox
                 string codigoABuscar = mtpTxtblBuscarCodigo.Text.Trim();
-
                 List<MateriaPrimaDP> resultado;
 
-                // 3. Decidimos qué método del DP llamar según el contenido
+                // Decidimos qué función usar según el TextBox
                 if (string.IsNullOrEmpty(codigoABuscar))
                 {
-                    // Si está vacío, llamamos a la consulta general
                     resultado = mensajeroDP.ConsultaGeneralDP();
                 }
                 else
                 {
-                    // Si tiene texto, llamamos a la búsqueda específica
                     resultado = mensajeroDP.ConsultaPorParametroDP(codigoABuscar);
                 }
 
-                // 4. Refrescamos el DataGrid
                 mtpDatGri.ItemsSource = resultado;
 
-                // 5. Validación de resultados vacíos
                 if (resultado.Count == 0 && !string.IsNullOrEmpty(codigoABuscar))
                 {
                     MessageBox.Show("No se encontró ninguna materia prima con el código: " + codigoABuscar);

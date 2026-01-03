@@ -28,6 +28,9 @@ namespace Administracion.GUI
         {
             InitializeComponent();
             this.Title = "Nuevo Registro de Materia Prima";
+
+            // 1. Cargamos el ComboBox al abrir la ventana
+            CargarUnidades();
         }
 
         // Constructor para MODIFICAR
@@ -36,43 +39,58 @@ namespace Administracion.GUI
             esModificacion = true;
             this.Title = "Modificar Materia Prima";
 
-            // Llenamos los campos con los datos existentes
             txtCodigo.Text = datosExistentes.MtpCodigo;
-            txtCodigo.IsEnabled = false; // Llave primaria no editable
+            txtCodigo.IsEnabled = false;
 
-            txtUnidad.Text = datosExistentes.UmeCodigo;
             txtNombre.Text = datosExistentes.MtpNombre;
             txtDescripcion.Text = datosExistentes.MtpDescripcion;
-
-            // Mostramos los precios (usando el actual)
             txtPrecio.Text = datosExistentes.MtpPrecioCompra.ToString();
 
-            // Guardamos el precio anterior internamente por si el MD lo necesita
+            // 2. Seleccionar el ítem en el ComboBox usando el valor que viene de la BD
+            cmbUnidadMedida.SelectedValue = datosExistentes.UmeCodigo;
+
             Resultado = datosExistentes;
+        }
+
+        private void CargarUnidades()
+        {
+            try
+            {
+                UnidadMedidaDP unidad = new UnidadMedidaDP();
+                // Llama al método que creamos en el DP para traer los códigos de Oracle
+                cmbUnidadMedida.ItemsSource = unidad.ConsultarTodos();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al cargar unidades de medida: " + ex.Message);
+            }
         }
 
         private void btnGuardar_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Validación básica
-                if (string.IsNullOrWhiteSpace(txtCodigo.Text) || string.IsNullOrWhiteSpace(txtNombre.Text))
+                // 3. Validación: Incluimos el ComboBox en la validación obligatoria
+                if (string.IsNullOrWhiteSpace(txtCodigo.Text) ||
+                    string.IsNullOrWhiteSpace(txtNombre.Text) ||
+                    cmbUnidadMedida.SelectedValue == null)
                 {
-                    MessageBox.Show("Por favor, complete los campos obligatorios (Código y Nombre).");
+                    MessageBox.Show("Por favor, complete Código, Nombre y seleccione una Unidad de Medida.");
                     return;
                 }
 
-                // Si es modificación, el precio actual pasa a ser el anterior
                 double precioAnterior = 0;
                 if (esModificacion && Resultado != null)
                 {
                     precioAnterior = Resultado.MtpPrecioCompra;
                 }
 
+                // 4. Creamos el objeto Resultado capturando los datos de la interfaz
                 Resultado = new MateriaPrimaDP
                 {
                     MtpCodigo = txtCodigo.Text.Trim(),
-                    UmeCodigo = txtUnidad.Text.Trim(),
+                    // USAMOS el valor seleccionado del ComboBox (SelectedValue)
+                    UmeCodigo = cmbUnidadMedida.SelectedValue.ToString(),
                     MtpNombre = txtNombre.Text.Trim(),
                     MtpDescripcion = txtDescripcion.Text.Trim(),
                     MtpPrecioCompraAnt = precioAnterior,
@@ -83,7 +101,7 @@ namespace Administracion.GUI
             }
             catch (FormatException)
             {
-                MessageBox.Show("El precio debe ser un valor numérico válido.");
+                MessageBox.Show("El precio debe ser un valor numérico válido (use coma o punto según su región).");
             }
             catch (Exception ex)
             {

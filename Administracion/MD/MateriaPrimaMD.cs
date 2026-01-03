@@ -1,23 +1,21 @@
-﻿using System;
+﻿using Administracion.Datos;
+using Administracion.DP;
+using Oracle.ManagedDataAccess.Client; // Asegúrate de tener la referencia
+using System;
 using System.Collections.Generic;
 using System.Data;
-using Oracle.ManagedDataAccess.Client; // Asegúrate de tener la referencia
-using Administracion.DP;
 
 namespace Administracion.MD
 {
     public class MateriaPrimaMD
     {
-        // Cadena de conexión (Ajustar según tu instancia)
-        private string connectionString = "User Id=a_prueba;Password=lticPUCE24;Data Source=192.168.5.125:1521/PRUEBA";
-
         // MÉTODO PARA CONSULTAR GENERAL
         public List<MateriaPrimaDP> ConsultaGeneralMD()
         {
             List<MateriaPrimaDP> lista = new List<MateriaPrimaDP>();
             string query = "SELECT * FROM MATERIA_PRIMA";
 
-            using (OracleConnection conn = new OracleConnection(connectionString))
+            using (OracleConnection conn = OracleDB.CrearConexion())
             {
                 OracleCommand cmd = new OracleCommand(query, conn);
                 try
@@ -47,7 +45,7 @@ namespace Administracion.MD
             List<MateriaPrimaDP> lista = new List<MateriaPrimaDP>();
             string query = "SELECT * FROM MATERIA_PRIMA WHERE MTP_CODIGO = :cod";
 
-            using (OracleConnection conn = new OracleConnection(connectionString))
+            using (OracleConnection conn = OracleDB.CrearConexion())
             {
                 OracleCommand cmd = new OracleCommand(query, conn);
                 cmd.Parameters.Add(new OracleParameter("cod", codigo));
@@ -79,7 +77,7 @@ namespace Administracion.MD
             string sql = "INSERT INTO MATERIA_PRIMA (MTP_CODIGO, UME_CODIGO, MTP_NOMBRE, MTP_DESCRIPCION, MTP_PRECIO_COMPRA_ANT, MTP_PRECIO_COMPRA) " +
                  "VALUES (:cod, :uni, :nom, :des, :pant, :pact)";
 
-            using (OracleConnection conn = new OracleConnection(connectionString))
+            using (OracleConnection conn = OracleDB.CrearConexion())
             {
                 OracleCommand cmd = new OracleCommand(sql, conn);
                 cmd.Parameters.Add(new OracleParameter("cod", dp.MtpCodigo));
@@ -100,7 +98,7 @@ namespace Administracion.MD
                          "MTP_DESCRIPCION = :des, MTP_PRECIO_COMPRA_ANT = :pant, " +
                          "MTP_PRECIO_COMPRA = :pact WHERE MTP_CODIGO = :cod";
 
-            using (OracleConnection conn = new OracleConnection(connectionString))
+            using (OracleConnection conn = OracleDB.CrearConexion())
             {
                 OracleCommand cmd = new OracleCommand(sql, conn);
                 cmd.Parameters.Add(new OracleParameter("uni", dp.UmeCodigo));
@@ -120,7 +118,7 @@ namespace Administracion.MD
         {
             string sql = "DELETE FROM MATERIA_PRIMA WHERE MTP_CODIGO = :cod";
 
-            using (OracleConnection conn = new OracleConnection(connectionString))
+            using (OracleConnection conn = OracleDB.CrearConexion())
             {
                 OracleCommand cmd = new OracleCommand(sql, conn);
                 cmd.Parameters.Add(new OracleParameter("cod", codigo));

@@ -1,16 +1,19 @@
 ﻿<Window x:Class="Administracion.GUI.MateriaPrimaForm"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Registro de Materia Prima" Height="400" Width="350" WindowStartupLocation="CenterOwner">
+        Title="Registro de Materia Prima" Height="420" Width="350" WindowStartupLocation="CenterOwner">
     <Grid Margin="15">
         <StackPanel>
-            <TextBlock Text="NUEVA MATERIA PRIMA" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+            <TextBlock Text="GESTIÓN DE MATERIA PRIMA" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,15"/>
 
             <Label Content="Código (MTP_CODIGO):"/>
             <TextBox x:Name="txtCodigo" Margin="0,0,0,10"/>
 
-            <Label Content="Unidad de Medida (UME_CODIGO):"/>
-            <TextBox x:Name="txtUnidad" Margin="0,0,0,10" MaxLength="7"/>
+            <Label Content="Unidad de Medida:"/>
+            <ComboBox x:Name="cmbUnidadMedida" 
+                      Margin="0,0,0,10"
+                      DisplayMemberPath="UmeCodigo" 
+                      SelectedValuePath="UmeCodigo" />
 
             <Label Content="Nombre:"/>
             <TextBox x:Name="txtNombre" Margin="0,0,0,10"/>

@@ -122,6 +122,52 @@ namespace Administracion.GUI
         {
             // nada
         }
+
+        // Para el panel de nuevo cliente
+        private void CliBtnIngresar(object sender, RoutedEventArgs e)
+        {
+            PanelNuevoCliente.Visibility = Visibility.Visible;
+            LimpiarFormulario();
+        }
+        private void BtnCancelar_Click(object sender, RoutedEventArgs e)
+        {
+            PanelNuevoCliente.Visibility = Visibility.Collapsed;
+        }
+        private void BtnGuardar_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(TxtUsrNombre.Text) ||
+                    string.IsNullOrWhiteSpace(TxtCedula.Text) ||
+                    CmbRol.SelectedItem == null)
+                {
+                    MessageBox.Show("Complete todos los campos.");
+                    return;
+                }
+
+                clienteMd.InsertarCliente(
+                    TxtUsrNombre.Text.Trim(),
+                    TxtCedula.Text.Trim(),
+                    TxtPassword.Text.Trim(),
+                    ((ComboBoxItem)CmbRol.SelectedItem).Content.ToString()
+                );
+
+                PanelNuevoCliente.Visibility = Visibility.Collapsed;
+                CargarClientes();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al ingresar cliente:\n" + ex.Message);
+            }
+        }
+        private void LimpiarFormulario()
+        {
+            TxtUsrNombre.Text = "";
+            TxtCedula.Text = "";
+            TxtPassword.Text = "";
+            CmbRol.SelectedIndex = -1;
+        }
+
     }
 }
 

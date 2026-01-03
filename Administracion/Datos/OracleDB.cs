@@ -17,7 +17,6 @@ namespace Administracion.Datos
             /* Leer el archivo de configuración */
             string configured = ConfigurationManager.AppSettings["propertiesFile"];
 
-            /* If configured references the old Path.properties name, map it to Conexion.properties */
             if (!string.IsNullOrEmpty(configured) && configured.IndexOf("Paths.properties", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 configured = configured.Replace("Path.properties", "Paths.properties", StringComparison.OrdinalIgnoreCase);

@@ -136,5 +136,28 @@ namespace Administracion.MD
                 throw new Exception("Error al cambiar rol del cliente.", ex);
             }
         }
+
+        /**
+         * Inserta un nuevo usuario.
+         */
+        public int InsertarCliente(string usr, string cedula, string password, string rol)
+        {
+            const string sql = @"
+        INSERT INTO USUARIO_APP
+        (USR_NOMBRE, CLI_CEDULA, USR_CONTRASENA, USR_ROL, USR_ESTADO)
+        VALUES (:usr, :cedula, :pass, :rol, 'A')";
+
+            using var conn = OracleDB.CrearConexion();
+            conn.Open();
+
+            using var cmd = new OracleCommand(sql, conn);
+            cmd.Parameters.Add(new OracleParameter("usr", usr));
+            cmd.Parameters.Add(new OracleParameter("cedula", cedula));
+            cmd.Parameters.Add(new OracleParameter("pass", password));
+            cmd.Parameters.Add(new OracleParameter("rol", rol));
+
+            return cmd.ExecuteNonQuery();
+        }
+
     }
 }

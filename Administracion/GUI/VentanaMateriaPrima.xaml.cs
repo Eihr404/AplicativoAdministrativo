@@ -33,9 +33,14 @@ namespace Administracion.GUI
         {
             try
             {
-                // Reutilizamos la lógica que ya tienes en el botón consultar
-                // mtpTxtblBuscarCodigo.Text estará vacío, por lo que traerá todo (SELECT * FROM...)
-                var resultado = modelo.Consultar(mtpTxtblBuscarCodigo.Text);
+                // 1. Instanciamos el DP como mensajero
+                MateriaPrimaDP mensajeroDP = new MateriaPrimaDP();
+
+                // 2. Llamamos al método especializado en traer todo
+                // Ya no dependemos de si el TextBox está vacío o no
+                var resultado = mensajeroDP.ConsultaGeneralDP();
+
+                // 3. Asignamos al DataGrid
                 mtpDatGri.ItemsSource = resultado;
             }
             catch (Exception ex)
@@ -65,17 +70,30 @@ namespace Administracion.GUI
         {
             try
             {
-                // 1. Obtenemos el código del TextBox
+                // 1. Instanciamos el DP como mensajero
+                MateriaPrimaDP mensajeroDP = new MateriaPrimaDP();
+
+                // 2. Obtenemos el código del TextBox
                 string codigoABuscar = mtpTxtblBuscarCodigo.Text.Trim();
 
-                // 2. Llamamos al método Consultar pasando el filtro
-                // Si el TextBox está vacío, el MD ejecutará el SELECT general
-                var resultado = modelo.Consultar(codigoABuscar);
+                List<MateriaPrimaDP> resultado;
 
-                // 3. Refrescamos el DataGrid con el resultado filtrado
+                // 3. Decidimos qué método del DP llamar según el contenido
+                if (string.IsNullOrEmpty(codigoABuscar))
+                {
+                    // Si está vacío, llamamos a la consulta general
+                    resultado = mensajeroDP.ConsultaGeneralDP();
+                }
+                else
+                {
+                    // Si tiene texto, llamamos a la búsqueda específica
+                    resultado = mensajeroDP.ConsultaPorParametroDP(codigoABuscar);
+                }
+
+                // 4. Refrescamos el DataGrid
                 mtpDatGri.ItemsSource = resultado;
 
-                // Opcional: Avisar si no se encontró nada
+                // 5. Validación de resultados vacíos
                 if (resultado.Count == 0 && !string.IsNullOrEmpty(codigoABuscar))
                 {
                     MessageBox.Show("No se encontró ninguna materia prima con el código: " + codigoABuscar);
@@ -90,21 +108,24 @@ namespace Administracion.GUI
         // Evento para el botón INGRESAR
         private void mtpBtnIngresar_Click(object sender, RoutedEventArgs e)
         {
-            // 1. Abrimos el formulario
+            // 1. Abrimos el formulario de ingreso
             MateriaPrimaForm formulario = new MateriaPrimaForm();
-            formulario.Owner = Window.GetWindow(this); // Para que se centre respecto al Main
+            formulario.Owner = Window.GetWindow(this);
 
-            // 2. Si el usuario presionó "Guardar"
+            // 2. Si el usuario presionó "Guardar" en el formulario
             if (formulario.ShowDialog() == true)
             {
                 try
                 {
-                    // 3. Obtenemos el objeto del formulario y lo enviamos al MD
-                    int filas = modelo.Insertar(formulario.Resultado);
+                    // 3. Obtenemos el objeto DP del formulario
+                    MateriaPrimaDP nuevoRegistro = formulario.Resultado;
+
+                    // 4. EL CAMBIO CLAVE: El DP llama a su propio método de inserción
+                    int filas = nuevoRegistro.InsertarDP();
 
                     if (filas > 0)
                     {
-                        MessageBox.Show("Materia prima registrada.");
+                        MessageBox.Show("Materia prima registrada correctamente.");
                         mtpBtnConsultar_Click(null, null); // Refrescar la tabla
                     }
                 }
@@ -120,6 +141,7 @@ namespace Administracion.GUI
         {
             try
             {
+                MateriaPrimaDP mensajeroDP = new MateriaPrimaDP();
                 MateriaPrimaDP seleccionado = null;
 
                 // 1. Obtener el objeto a modificar
@@ -129,27 +151,28 @@ namespace Administracion.GUI
                 }
                 else if (!string.IsNullOrEmpty(mtpTxtblBuscarCodigo.Text.Trim()))
                 {
-                    // Si no hay selección, buscamos en la base de datos por el código del TextBox
-                    var busqueda = modelo.Consultar(mtpTxtblBuscarCodigo.Text.Trim());
-                    if (busqueda.Count > 0)
-                        seleccionado = busqueda[0];
+                    // El GUI le pide al DP que busque la información
+                    mensajeroDP.MtpCodigo = mtpTxtblBuscarCodigo.Text.Trim();
+                    var resultados = mensajeroDP.ConsultaGeneralDP(); // Método en DP que llama al MD
+
+                    if (resultados.Count > 0)
+                        seleccionado = resultados[0];
                 }
 
                 if (seleccionado == null)
                 {
-                    MessageBox.Show("Por favor, seleccione una fila o ingrese un código válido para modificar.");
+                    MessageBox.Show("Por favor, seleccione una fila o ingrese un código válido.");
                     return;
                 }
 
-                // 2. Abrir el formulario pasando los datos actuales
-                // Reutilizamos MateriaPrimaForm, pero le pasamos el objeto 'seleccionado'
+                // 2. Abrir el formulario con los datos cargados
                 MateriaPrimaForm formulario = new MateriaPrimaForm(seleccionado);
                 formulario.Owner = Window.GetWindow(this);
 
                 if (formulario.ShowDialog() == true)
                 {
-                    // 3. Llamar al método Actualizar del MD
-                    int filas = modelo.Actualizar(formulario.Resultado);
+                    // 3. El objeto Resultado del formulario (que es un DP) ejecuta la actualización
+                    int filas = formulario.Resultado.ActualizarDP();
 
                     if (filas > 0)
                     {
@@ -169,52 +192,52 @@ namespace Administracion.GUI
         {
             try
             {
-                string codigoAEliminar = "";
+                // 1. Creamos el objeto DP que actuará como mensajero
+                MateriaPrimaDP mensajeroDP = new MateriaPrimaDP();
                 string nombreMostrar = "";
 
-                // 1. Prioridad: Revisar si hay una fila seleccionada en el DataGrid
+                // 2. Prioridad: Revisar si hay una fila seleccionada
                 if (mtpDatGri.SelectedItem is MateriaPrimaDP seleccionado)
                 {
-                    codigoAEliminar = seleccionado.MtpCodigo;
+                    mensajeroDP.MtpCodigo = seleccionado.MtpCodigo;
                     nombreMostrar = seleccionado.MtpNombre;
                 }
-                // 2. Si no hay selección, revisar el TextBox
+                // 3. Si no hay selección, revisar el TextBox
                 else if (!string.IsNullOrEmpty(mtpTxtblBuscarCodigo.Text.Trim()))
                 {
-                    codigoAEliminar = mtpTxtblBuscarCodigo.Text.Trim();
-                    nombreMostrar = "el registro con código " + codigoAEliminar;
+                    mensajeroDP.MtpCodigo = mtpTxtblBuscarCodigo.Text.Trim();
+                    nombreMostrar = "el registro con código " + mensajeroDP.MtpCodigo;
                 }
                 else
                 {
-                    MessageBox.Show("Por favor, seleccione una fila o ingrese un código en el cuadro de búsqueda.");
+                    MessageBox.Show("Por favor, seleccione una fila o ingrese un código.");
                     return;
                 }
 
-                // 3. Confirmación del usuario
+                // 4. Confirmación del usuario
                 var respuesta = MessageBox.Show($"¿Está seguro de que desea eliminar {nombreMostrar}?",
-                                               "Confirmar Eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                                               "Confirmar", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
                 if (respuesta == MessageBoxResult.Yes)
                 {
-                    // 4. Llamada al método Eliminar en el MD
-                    int filasAfectadas = modelo.Eliminar(codigoAEliminar);
+                    // LLAMADA AL DP (Él se encarga de hablar con el MD)
+                    int filasAfectadas = mensajeroDP.EliminarDP();
 
                     if (filasAfectadas > 0)
                     {
                         MessageBox.Show("Registro eliminado correctamente.");
-                        // Limpiamos el buscador y refrescamos la tabla
                         mtpTxtblBuscarCodigo.Clear();
-                        mtpBtnConsultar_Click(null, null);
+                        mtpBtnConsultar_Click(null, null); // Refrescar DataGrid
                     }
                     else
                     {
-                        MessageBox.Show("No se encontró ningún registro con ese código para eliminar.");
+                        MessageBox.Show("No se encontró el registro en la base de datos.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error al intentar eliminar: " + ex.Message);
+                MessageBox.Show("Error: " + ex.Message);
             }
         }
     }

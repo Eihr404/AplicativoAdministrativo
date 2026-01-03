@@ -17,7 +17,7 @@
             <TextBox x:Name="mtpTxtblBuscarCodigo" TextWrapping="Wrap" Width="250"/>
             <Button x:Name="mtpBtnConsultar" Content="Consultar" Margin="5,0,0,0" Click="mtpBtnConsultar_Click"/>
             <Button x:Name="mtpBtnIngresar" Content="Ingresar" Margin="5,0,0,0" Click="mtpBtnIngresar_Click"/>
-            <Button x:Name="mtpBtnModificar" Content="Modificar" Margin="5,0,0,0"/>
+            <Button x:Name="mtpBtnModificar" Content="Modificar" Margin="5,0,0,0" Click="mtpBtnModificar_Click"/>
             <Button x:Name="mtpBtnEliminar" Content="Eliminar" Margin="5,0,0,0" Click="mtpBtnEliminar_Click"/>
         </StackPanel>
 

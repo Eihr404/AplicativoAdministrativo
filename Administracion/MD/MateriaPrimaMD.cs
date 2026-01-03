@@ -73,6 +73,27 @@ namespace Administracion.MD
                 return cmd.ExecuteNonQuery(); // Retorna filas afectadas
             }
         }
+        public int Actualizar(MateriaPrimaDP dp)
+        {
+            // Actualizamos nombre, unidad, descripción y precios basándonos en el código
+            string sql = "UPDATE MATERIA_PRIMA SET UME_CODIGO = :uni, MTP_NOMBRE = :nom, " +
+                         "MTP_DESCRIPCION = :des, MTP_PRECIO_COMPRA_ANT = :pant, " +
+                         "MTP_PRECIO_COMPRA = :pact WHERE MTP_CODIGO = :cod";
+
+            using (OracleConnection conn = new OracleConnection(connectionString))
+            {
+                OracleCommand cmd = new OracleCommand(sql, conn);
+                cmd.Parameters.Add(new OracleParameter("uni", dp.UmeCodigo));
+                cmd.Parameters.Add(new OracleParameter("nom", dp.MtpNombre));
+                cmd.Parameters.Add(new OracleParameter("des", dp.MtpDescripcion));
+                cmd.Parameters.Add(new OracleParameter("pant", dp.MtpPrecioCompraAnt));
+                cmd.Parameters.Add(new OracleParameter("pact", dp.MtpPrecioCompra));
+                cmd.Parameters.Add(new OracleParameter("cod", dp.MtpCodigo));
+
+                conn.Open();
+                return cmd.ExecuteNonQuery();
+            }
+        }
 
         // MÉTODO PARA ELIMINAR
         public int Eliminar(string codigo)

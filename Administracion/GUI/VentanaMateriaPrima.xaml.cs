@@ -115,6 +115,55 @@ namespace Administracion.GUI
             }
         }
 
+        // Evento para el botón Modificar
+        private void mtpBtnModificar_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                MateriaPrimaDP seleccionado = null;
+
+                // 1. Obtener el objeto a modificar
+                if (mtpDatGri.SelectedItem is MateriaPrimaDP filaSeleccionada)
+                {
+                    seleccionado = filaSeleccionada;
+                }
+                else if (!string.IsNullOrEmpty(mtpTxtblBuscarCodigo.Text.Trim()))
+                {
+                    // Si no hay selección, buscamos en la base de datos por el código del TextBox
+                    var busqueda = modelo.Consultar(mtpTxtblBuscarCodigo.Text.Trim());
+                    if (busqueda.Count > 0)
+                        seleccionado = busqueda[0];
+                }
+
+                if (seleccionado == null)
+                {
+                    MessageBox.Show("Por favor, seleccione una fila o ingrese un código válido para modificar.");
+                    return;
+                }
+
+                // 2. Abrir el formulario pasando los datos actuales
+                // Reutilizamos MateriaPrimaForm, pero le pasamos el objeto 'seleccionado'
+                MateriaPrimaForm formulario = new MateriaPrimaForm(seleccionado);
+                formulario.Owner = Window.GetWindow(this);
+
+                if (formulario.ShowDialog() == true)
+                {
+                    // 3. Llamar al método Actualizar del MD
+                    int filas = modelo.Actualizar(formulario.Resultado);
+
+                    if (filas > 0)
+                    {
+                        MessageBox.Show("Registro actualizado correctamente.");
+                        mtpBtnConsultar_Click(null, null); // Refrescar tabla
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al modificar: " + ex.Message);
+            }
+        }
+
         // Evento para el botón ELIMINAR
         private void mtpBtnEliminar_Click(object sender, RoutedEventArgs e)
         {

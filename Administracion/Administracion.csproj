@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -11,8 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Datos\Conexion.properties" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Carrito.ico" />
-    <Content Include="Datos\Paths.properties">
+    <Content Include="Datos\Conexion.properties">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -50,4 +54,3 @@
   </ItemGroup>
 
 </Project>
-

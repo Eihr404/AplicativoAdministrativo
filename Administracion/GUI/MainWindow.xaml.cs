@@ -81,10 +81,17 @@ namespace Administracion.GUI
                 case "Clientes":
                     MainContent.Content = new Cliente();
                     break;
+<<<<<<< HEAD
+                case "MateriaPrima":
+                    MainContent.Content = new MateriaPrima();
+                    break;
+                    
+=======
 
                 case "Productos":
                     CambiarVista(new VentanaProducto(this));
                     break;
+>>>>>>> 627a423e490f5c998425a4d4850485cda35618f5
             }
         }
     }

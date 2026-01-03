@@ -86,7 +86,7 @@ namespace Administracion.GUI
             }
         }
 
-        private void BtnCambiarRol_Click(object sender, RoutedEventArgs e)
+        private void BtnModificarRol_Click(object sender, RoutedEventArgs e)
         {
             ClienteDP? cli = ClienteSeleccionado();
             if (cli == null)
@@ -141,7 +141,7 @@ namespace Administracion.GUI
                 clienteService.InsertarCliente(
                     TxtUsrNombre.Text.Trim(),
                     TxtCedula.Text.Trim(),
-                    TxtPassword.Text.Trim(),
+                    TxtPassword.Password.Trim(),
                     ((ComboBoxItem)CmbRol.SelectedItem).Content.ToString()
                 );
 
@@ -157,7 +157,7 @@ namespace Administracion.GUI
         {
             TxtUsrNombre.Text = "";
             TxtCedula.Text = "";
-            TxtPassword.Text = "";
+            TxtPassword.Password = "";
             CmbRol.SelectedIndex = -1;
         }
 

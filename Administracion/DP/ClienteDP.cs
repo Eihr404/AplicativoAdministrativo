@@ -12,7 +12,7 @@ namespace Administracion.DP
         {
             get
             {
-                return EstadoCodigo == "A" ? "ACTIVO" : "INACTIVO";
+                return EstadoCodigo == "A" ? "ACTIVO" : "ELIMINADO";
             }
         }
         public string NombreFactura { get; set; } = string.Empty;

@@ -30,7 +30,7 @@ namespace Administracion.GUI
             this.Title = OracleDB.GetConfig("titulo.formulario.nuevo");
             CargarUnidades();
         }
-
+        /* Constructor para modificación */
         public MateriaPrimaForm(MateriaPrimaDP datosExistentes) : this()
         {
             esModificacion = true;
@@ -45,7 +45,7 @@ namespace Administracion.GUI
 
             Resultado = datosExistentes;
         }
-
+        /* Carga las unidades de medida en el ComboBox */
         private void CargarUnidades()
         {
             try
@@ -59,12 +59,12 @@ namespace Administracion.GUI
                 MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
             }
         }
-
+        /* Evento para el botón Guardar */
         private void btnGuardar_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // 1. Validación usando error.validacion del .properties
+                /* Validación usando error.validacion del .properties */
                 if (string.IsNullOrWhiteSpace(txtCodigo.Text) ||
                     string.IsNullOrWhiteSpace(txtNombre.Text) ||
                     cmbUnidadMedida.SelectedValue == null)
@@ -101,7 +101,7 @@ namespace Administracion.GUI
                 MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
             }
         }
-
+        /* Evento para el botón Cancelar */
         private void btnCancelar_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = false;

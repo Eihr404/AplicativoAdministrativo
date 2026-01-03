@@ -40,7 +40,7 @@ namespace Administracion.GUI
             try
             {
                 // Asegúrate de que ProductoDP tenga el método ConsultaGeneralDP()
-                cmbMateriaPrima.ItemsSource = new MateriaPrimaDP().ConsultaGeneralDP();
+                cmbMateriaPrima.ItemsSource = new MateriaPrimaDP().ConsultarAllDP();
                 cmbProducto.ItemsSource = new ProductoDP().ConsultarAllDP();
             }
             catch (Exception ex)

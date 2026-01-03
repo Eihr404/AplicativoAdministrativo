@@ -10,7 +10,7 @@ namespace Administracion.MD
     public class MateriaPrimaMD
     {
         // MÉTODO PARA CONSULTAR GENERAL
-        public List<MateriaPrimaDP> ConsultaGeneralMD()
+        public List<MateriaPrimaDP> ConsultarAllMD()
         {
             List<MateriaPrimaDP> lista = new List<MateriaPrimaDP>();
             string query = "SELECT * FROM MATERIA_PRIMA";
@@ -40,7 +40,7 @@ namespace Administracion.MD
             return lista;
         }
         // MÉTODO PARA CONSULTAR POR PARAMETRO (CODIGO)
-        public List<MateriaPrimaDP> ConsultaPorParametroMD(string codigo)
+        public List<MateriaPrimaDP> ConsultarByCodMD(string codigo)
         {
             List<MateriaPrimaDP> lista = new List<MateriaPrimaDP>();
             string query = "SELECT * FROM MATERIA_PRIMA WHERE MTP_CODIGO = :cod";

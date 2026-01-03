@@ -11,7 +11,7 @@ namespace Administracion.MD
 {
     public class EstandarProduccionMD
     {
-        public List<EstandarProduccionDP> ConsultaGeneralMD()
+        public List<EstandarProduccionDP> ConsultarAllMD()
         {
             List<EstandarProduccionDP> lista = new List<EstandarProduccionDP>();
             string query = "SELECT * FROM ESTANDAR_PRODUCCION";

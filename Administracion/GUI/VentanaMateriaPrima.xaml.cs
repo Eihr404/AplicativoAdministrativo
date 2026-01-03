@@ -33,7 +33,7 @@ namespace Administracion.GUI
             try
             {
                 MateriaPrimaDP mensajeroDP = new MateriaPrimaDP();
-                mtpDatGri.ItemsSource = mensajeroDP.ConsultaGeneralDP();
+                mtpDatGri.ItemsSource = mensajeroDP.ConsultarAllDP();
             }
             catch (Exception ex)
             {
@@ -51,8 +51,8 @@ namespace Administracion.GUI
                 List<MateriaPrimaDP> resultado;
 
                 resultado = string.IsNullOrEmpty(codigoABuscar)
-                    ? mensajeroDP.ConsultaGeneralDP()
-                    : mensajeroDP.ConsultaPorParametroDP(codigoABuscar);
+                    ? mensajeroDP.ConsultarAllDP()
+                    : mensajeroDP.ConsultarByCodDP(codigoABuscar);
 
                 mtpDatGri.ItemsSource = resultado;
 

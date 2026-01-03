@@ -1,4 +1,5 @@
-﻿using Administracion.DP;
+﻿using Administracion.Datos;
+using Administracion.DP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,56 +24,65 @@ namespace Administracion.GUI
         public MateriaPrimaDP Resultado { get; set; }
         private bool esModificacion = false;
 
-        // Constructor para INSERTAR
         public MateriaPrimaForm()
         {
             InitializeComponent();
-            this.Title = "Nuevo Registro de Materia Prima";
+            this.Title = OracleDB.GetConfig("titulo.formulario.nuevo");
+            CargarUnidades();
         }
 
-        // Constructor para MODIFICAR
         public MateriaPrimaForm(MateriaPrimaDP datosExistentes) : this()
         {
             esModificacion = true;
-            this.Title = "Modificar Materia Prima";
+            this.Title = OracleDB.GetConfig("titulo.formulario.editar");
 
-            // Llenamos los campos con los datos existentes
             txtCodigo.Text = datosExistentes.MtpCodigo;
-            txtCodigo.IsEnabled = false; // Llave primaria no editable
-
-            txtUnidad.Text = datosExistentes.UmeCodigo;
+            txtCodigo.IsEnabled = false;
             txtNombre.Text = datosExistentes.MtpNombre;
             txtDescripcion.Text = datosExistentes.MtpDescripcion;
-
-            // Mostramos los precios (usando el actual)
             txtPrecio.Text = datosExistentes.MtpPrecioCompra.ToString();
+            cmbUnidadMedida.SelectedValue = datosExistentes.UmeCodigo;
 
-            // Guardamos el precio anterior internamente por si el MD lo necesita
             Resultado = datosExistentes;
+        }
+
+        private void CargarUnidades()
+        {
+            try
+            {
+                UnidadMedidaDP unidad = new UnidadMedidaDP();
+                cmbUnidadMedida.ItemsSource = unidad.ConsultarTodos();
+            }
+            catch (Exception ex)
+            {
+                // Uso de error.general
+                MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
+            }
         }
 
         private void btnGuardar_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Validación básica
-                if (string.IsNullOrWhiteSpace(txtCodigo.Text) || string.IsNullOrWhiteSpace(txtNombre.Text))
+                // 1. Validación usando error.validacion del .properties
+                if (string.IsNullOrWhiteSpace(txtCodigo.Text) ||
+                    string.IsNullOrWhiteSpace(txtNombre.Text) ||
+                    cmbUnidadMedida.SelectedValue == null)
                 {
-                    MessageBox.Show("Por favor, complete los campos obligatorios (Código y Nombre).");
+                    MessageBox.Show(OracleDB.GetConfig("error.validacion"),
+                                    OracleDB.GetConfig("titulo.confirmacion"),
+                                    MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                // Si es modificación, el precio actual pasa a ser el anterior
-                double precioAnterior = 0;
-                if (esModificacion && Resultado != null)
-                {
-                    precioAnterior = Resultado.MtpPrecioCompra;
-                }
+                double precioAnterior = (esModificacion && Resultado != null)
+                                        ? Resultado.MtpPrecioCompra
+                                        : 0;
 
                 Resultado = new MateriaPrimaDP
                 {
                     MtpCodigo = txtCodigo.Text.Trim(),
-                    UmeCodigo = txtUnidad.Text.Trim(),
+                    UmeCodigo = cmbUnidadMedida.SelectedValue.ToString(),
                     MtpNombre = txtNombre.Text.Trim(),
                     MtpDescripcion = txtDescripcion.Text.Trim(),
                     MtpPrecioCompraAnt = precioAnterior,
@@ -83,11 +93,12 @@ namespace Administracion.GUI
             }
             catch (FormatException)
             {
-                MessageBox.Show("El precio debe ser un valor numérico válido.");
+                MessageBox.Show(OracleDB.GetConfig("error.formato.numerico"),
+                        "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
             }
         }
 

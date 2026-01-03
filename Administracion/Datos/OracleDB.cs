@@ -18,9 +18,9 @@ namespace Administracion.Datos
             string configured = ConfigurationManager.AppSettings["propertiesFile"];
 
             // If configured references the old Path.properties name, map it to Conexion.properties
-            if (!string.IsNullOrEmpty(configured) && configured.IndexOf("Path.properties", StringComparison.OrdinalIgnoreCase) >= 0)
+            if (!string.IsNullOrEmpty(configured) && configured.IndexOf("Paths.properties", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                configured = configured.Replace("Path.properties", "Conexion.properties", StringComparison.OrdinalIgnoreCase);
+                configured = configured.Replace("Path.properties", "Paths.properties", StringComparison.OrdinalIgnoreCase);
             }
 
             // Prepare candidate paths (relative to app base dir)
@@ -28,11 +28,9 @@ namespace Administracion.Datos
             if (!string.IsNullOrWhiteSpace(configured))
                 candidates.Add(configured);
 
-            // Common names/locations to try (project has the file under Datos\Conexion.properties or at app root as Conexion.properties)
-            candidates.Add(Path.Combine("Datos", "Conexion.properties"));
-            candidates.Add("Conexion.properties");
-            candidates.Add(Path.Combine("Datos", "conexion.properties"));
-            candidates.Add("conexion.properties");
+            // Common names/locations to try (project has the file under Datos\Paths.properties or at app root as Conexion.properties)
+            candidates.Add(Path.Combine("Datos", "Paths.properties"));
+            candidates.Add("Paths.properties");
 
             string foundPath = null;
 
@@ -116,6 +114,26 @@ namespace Administracion.Datos
                 throw new Exception($"Falta el parámetro {key} en {propertiesFileName}");
 
             return props[key];
+        }
+        public static string GetConfig(string llave)
+        {
+            try
+            {
+                // Reutilizamos el método que ya tienes para leer el archivo
+                // Nota: Asegúrate de que la ruta coincida con la que usas en CrearConexion
+                string ruta = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Datos", "Paths.properties");
+
+                var lineas = File.ReadAllLines(ruta);
+                foreach (var linea in lineas)
+                {
+                    if (linea.Trim().StartsWith(llave + "="))
+                    {
+                        return linea.Split('=', 2)[1].Trim();
+                    }
+                }
+            }
+            catch { }
+            return $"[{llave} no encontrada]";
         }
     }
 }

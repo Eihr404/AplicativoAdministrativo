@@ -42,29 +42,27 @@ namespace Administracion.DP
         }
 
         /* Modifica un producto en la base de datos */
-        public void ModificarDP()
+        public bool ModificarDP()
         {
-
+            return productoMD.ModificarMD(this);
         }
 
         /* Elimina un producto de la base de datos */
-        public void EliminarDP()
+        public bool EliminarDP()
         {
-
+            return productoMD.EliminarMD(Codigo);
         }
 
         /* Consulta un producto por su código */
-        public void ConsultarByCodDP()
+        public ProductoDP ConsultarByCodDP(string codigo)
         {
-
+            return productoMD.ConsultarByCodMD(codigo);
         }
 
         /* Consulta los productos en la base de datos */
         public List<ProductoDP> ConsultarAllDP()
         {
-            List<ProductoDP> productos = new List<ProductoDP>();
-            productos = productoMD.ConsultarAllMD();
-            return productos;
+            return productoMD.ConsultarAllMD();
         }
 
         /* Verifica si el producto existe en la base de datos para evitar repetidos*/

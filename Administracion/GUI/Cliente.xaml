@@ -18,12 +18,11 @@
                 <TextBox x:Name="TxtBuscar" Width="260" Margin="0,0,10,0"
               VerticalContentAlignment="Center"
               ToolTip="Buscar por usuario o cédula"/>
-                <Button Content="Buscar" Width="90" Click="BtnBuscar_Click" Margin="0,0,10,0"/>
-                <Button Content="Refrescar" Width="90" Click="BtnRefrescar_Click" Margin="0,0,10,0"/>
-                <Button Content="Bloquear/Activar" Width="130" Click="BtnToggleEstado_Click" Margin="0,0,10,0"/>
-                <Button Content="Cambiar rol" Width="110" Click="BtnCambiarRol_Click" Margin="0,0,10,0"/>
-                <Button Content="Ingresar" Width="90" Click="CliBtnIngresar" />
-            </StackPanel>
+            <Button Content="Consultar" Width="90" Click="BtnConsultar_Click" Margin="0,0,10,0"/>
+            <Button Content="Ingresar" Width="90" Click="CliBtnIngresar" Margin="0,0,10,0"/>
+            <Button Content="Modificar" Width="130" Click="BtnToggleEstado_Click" Margin="0,0,10,0"/>
+            <Button Content="Cambiar rol" Width="110" Click="BtnCambiarRol_Click" Margin="0,0,10,0"/>
+        </StackPanel>
 
             <!-- Tabla -->
             <DataGrid x:Name="GridClientes"
@@ -74,12 +73,11 @@
                     </StackPanel>
 
                     <StackPanel Grid.ColumnSpan="2"
-     Orientation="Horizontal"
-     HorizontalAlignment="Right"
-     Margin="0,10,0,0">
+                                 Orientation="Horizontal"
+                                 HorizontalAlignment="Right"
+                                 Margin="0,10,0,0">
                         <Button Content="Guardar" Width="90" Click="BtnGuardar_Click"/>
-                        <Button Content="Cancelar" Width="90" Margin="10,0,0,0"
-     Click="BtnCancelar_Click"/>
+                        <Button Content="Cancelar" Width="90" Margin="10,0,0,0" Click="BtnCancelar_Click"/>
                     </StackPanel>
                 </Grid>
             </Border>

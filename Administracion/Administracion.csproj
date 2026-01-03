@@ -11,14 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Datos\Conexion.properties" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Carrito.ico" />
-    <Content Include="Datos\Conexion.properties">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>

@@ -143,6 +143,9 @@ namespace Administracion.GUI
                     MtpPrecioCompra = double.Parse(TxtMtpPrecio.Text)
                 };
 
+                if (MessageBox.Show(OracleDB.GetConfig("mensaje.confirmacion.guardar"),
+                    OracleDB.GetConfig("titulo.confirmacion"), MessageBoxButton.YesNo) == MessageBoxResult.No) return;
+
                 // 3. Ejecutar acción en DB
                 int filasAfectadas = esModificacion ? materia.ActualizarDP() : materia.InsertarDP();
 

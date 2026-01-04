@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Administracion.DP;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,19 +26,24 @@ namespace Administracion.GUI
         public Proveedor()
         {
             InitializeComponent();
-            PrvGuiCargarDatosIniciales();
+            CargarProveedores();
         }
 
-        private void PrvGuiCargarDatosIniciales()
+        private void CargarProveedores()
         {
             try
             {
-                ProveedorDP proveedoresDP = new ProveedorDP();
-                GridProveedor.ItemsSource = proveedoresDP.ObtenerProveedoresDP();
+                List<ProveedorDP> lista = ProveedorDP.Listar();
+                dgProveedores.ItemsSource = lista;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
+                MessageBox.Show(
+                    "Error al cargar proveedores:\n" + ex.Message,
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
             }
         }
 

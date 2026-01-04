@@ -34,12 +34,28 @@
                IsReadOnly="True"
                SelectionMode="Single">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Cédula" Binding="{Binding PrvCodigo}" Width="140"/>
-                <DataGridTextColumn Header="Empresa" Binding="{Binding EmpCedulaRuc}" Width="140"/>
-                <DataGridTextColumn Header="Nombre" Binding="{Binding PrvNombre}" Width="200"/>
-                <DataGridTextColumn Header="Telefono" Binding="{Binding PrvTelefono}" Width="140"/>
-                <DataGridTextColumn Header="Direccion" Binding="{Binding PrvDireccion}" Width="200"/>
+                <DataGridTextColumn
+                    Header="ID"
+                    Binding="{Binding PrvCodigo}"
+                    Width="Auto"/>
+
+                <DataGridTextColumn
+                    Header="Nombre"
+                    Binding="{Binding PrvNombre}"
+                    Width="*"/>
+
+                <DataGridTextColumn
+                    Header="RUC"
+                    Binding="{Binding EmpCedulaRuc}"
+                    Width="*"/>
+
+                <DataGridTextColumn
+                    Header="Teléfono"
+                    Binding="{Binding PrvTelefono}"
+                    Width="*"/>
+
             </DataGrid.Columns>
+
         </DataGrid>
 
         <!-- Para panel -->

@@ -25,11 +25,10 @@ namespace Administracion.GUI
         {
             try
             {
-                prdDatGri.ItemsSource = productoDP.ConsultarAllDP();
+                prdDatGri.ItemsSource = new ProductoDP().ConsultarAllDP();
             }
             catch (Exception ex)
             {
-                // error.general
                 MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
             }
         }
@@ -38,13 +37,13 @@ namespace Administracion.GUI
         {
             try
             {
+                // Cargamos los catálogos necesarios para el formulario
                 cmbCategoria.ItemsSource = new CategoriaDP().ConsultarTodos();
                 cmbClasificacion.ItemsSource = new ClasificacionDP().ConsultarTodos();
                 cmbUnidad.ItemsSource = new UnidadMedidaDP().ConsultarTodos();
             }
             catch (Exception ex)
             {
-                // error.general
                 MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
             }
         }
@@ -60,15 +59,12 @@ namespace Administracion.GUI
                 }
                 else
                 {
-                    productoDP.Codigo = criterio;
-                    var resultado = productoDP.ConsultarByCodDP();
-
-                    if (resultado == null || resultado.Count == 0)
+                    var result = new ProductoDP { Codigo = criterio }.ConsultarByCodDP();
+                    if (result == null || result.Count == 0)
                     {
-                        // error.no_encontrado
                         MessageBox.Show(OracleDB.GetConfig("error.no_encontrado"));
                     }
-                    prdDatGri.ItemsSource = resultado;
+                    prdDatGri.ItemsSource = result;
                 }
             }
             catch (Exception ex)
@@ -80,7 +76,6 @@ namespace Administracion.GUI
         private void prdBtnIngresar_Click(object sender, RoutedEventArgs e)
         {
             esModificacion = false;
-            // titulo.formulario.nuevo
             lblTituloForm.Text = OracleDB.GetConfig("titulo.formulario.nuevo");
             LimpiarCampos();
             txtPrdCodigo.IsEnabled = true;
@@ -91,16 +86,15 @@ namespace Administracion.GUI
         {
             if (prdDatGri.SelectedItem is not ProductoDP seleccionado)
             {
-                // error.no_encontrado (como aviso de selección)
                 MessageBox.Show(OracleDB.GetConfig("error.no_encontrado"));
                 return;
             }
 
             esModificacion = true;
-            productoDP = seleccionado;
-            // titulo.formulario.editar
+            this.productoDP = seleccionado; // Guardamos la referencia para el PrecioVentaAnt
             lblTituloForm.Text = OracleDB.GetConfig("titulo.formulario.editar");
 
+            // Mapeo de atributos al formulario
             txtPrdCodigo.Text = seleccionado.Codigo;
             txtPrdCodigo.IsEnabled = false;
             txtPrdNombre.Text = seleccionado.Nombre;
@@ -109,6 +103,7 @@ namespace Administracion.GUI
             txtPrdUtilidad.Text = seleccionado.Utilidad.ToString();
             txtPrdAltImagen.Text = seleccionado.AltTextImagen;
 
+            // Asignación de Combos (SelectedValue usa el SelectedValuePath del XAML)
             cmbCategoria.SelectedValue = seleccionado.CategoriaCodigo;
             cmbClasificacion.SelectedValue = seleccionado.ClasificacionCodigo;
             cmbUnidad.SelectedValue = seleccionado.UnidadMedidaCodigo;
@@ -122,38 +117,34 @@ namespace Administracion.GUI
             {
                 if (CamposInvalidos())
                 {
-                    // error.validacion
                     MessageBox.Show(OracleDB.GetConfig("error.validacion"));
                     return;
                 }
 
-                // Validación de formato numérico
-                if (!double.TryParse(txtPrdPrecio.Text, out double precio))
+                if (!double.TryParse(txtPrdPrecio.Text, out double precio) ||
+                    !double.TryParse(txtPrdUtilidad.Text, out double utilidad))
                 {
-                    // error.formato.numerico
                     MessageBox.Show(OracleDB.GetConfig("error.formato.numerico"));
                     return;
                 }
 
-                // mensaje.confirmacion.guardar
-                MessageBoxResult confirmar = MessageBox.Show(
-                    OracleDB.GetConfig("mensaje.confirmacion.guardar"),
-                    OracleDB.GetConfig("titulo.confirmacion"),
-                    MessageBoxButton.YesNo);
+                if (MessageBox.Show(OracleDB.GetConfig("mensaje.confirmacion.guardar"),
+                    OracleDB.GetConfig("titulo.confirmacion"), MessageBoxButton.YesNo) == MessageBoxResult.No) return;
 
-                if (confirmar == MessageBoxResult.No) return;
-
+                // Creación del objeto con todos los atributos necesarios
                 ProductoDP datos = new ProductoDP
                 {
                     Codigo = txtPrdCodigo.Text.Trim(),
                     Nombre = txtPrdNombre.Text.Trim(),
                     Descripcion = txtPrdDesc.Text.Trim(),
                     PrecioVenta = precio,
-                    Utilidad = double.Parse(txtPrdUtilidad.Text),
+                    Utilidad = utilidad,
                     AltTextImagen = txtPrdAltImagen.Text.Trim(),
                     CategoriaCodigo = cmbCategoria.SelectedValue.ToString(),
                     ClasificacionCodigo = cmbClasificacion.SelectedValue.ToString(),
                     UnidadMedidaCodigo = cmbUnidad.SelectedValue.ToString(),
+                    // Atributos adicionales
+                    Imagen = "default.png", // Aquí podrías poner una ruta de imagen si tuvieras el control
                     PrecioVentaAnt = esModificacion ? productoDP.PrecioVenta : 0
                 };
 
@@ -161,12 +152,7 @@ namespace Administracion.GUI
 
                 if (resultado)
                 {
-                    // exito.guardar / exito.actualizar
-                    string msgExito = esModificacion ?
-                        OracleDB.GetConfig("exito.actualizar") :
-                        OracleDB.GetConfig("exito.guardar");
-
-                    MessageBox.Show(msgExito);
+                    MessageBox.Show(esModificacion ? OracleDB.GetConfig("exito.actualizar") : OracleDB.GetConfig("exito.guardar"));
                     PanelFormularioPrd.Visibility = Visibility.Collapsed;
                     CargarProductos();
                 }
@@ -181,36 +167,27 @@ namespace Administracion.GUI
         {
             if (prdDatGri.SelectedItem is not ProductoDP seleccionado) return;
 
-            // mensaje.confirmacion.borrar
-            MessageBoxResult confirmar = MessageBox.Show(
-                OracleDB.GetConfig("mensaje.confirmacion.borrar"),
-                OracleDB.GetConfig("titulo.confirmacion"),
-                MessageBoxButton.YesNo);
-
-            if (confirmar == MessageBoxResult.Yes)
+            if (MessageBox.Show(OracleDB.GetConfig("mensaje.confirmacion.borrar"),
+                OracleDB.GetConfig("titulo.confirmacion"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 if (seleccionado.EliminarDP())
                 {
-                    // exito.eliminar
                     MessageBox.Show(OracleDB.GetConfig("exito.eliminar"));
                     CargarProductos();
                 }
             }
         }
 
-        private void BtnCancelar_Click(object sender, RoutedEventArgs e)
-        {
-            PanelFormularioPrd.Visibility = Visibility.Collapsed;
-        }
+        private void BtnCancelar_Click(object sender, RoutedEventArgs e) => PanelFormularioPrd.Visibility = Visibility.Collapsed;
 
         private void LimpiarCampos()
         {
-            txtPrdCodigo.Text = "";
-            txtPrdNombre.Text = "";
-            txtPrdDesc.Text = "";
-            txtPrdPrecio.Text = "";
-            txtPrdUtilidad.Text = "";
-            txtPrdAltImagen.Text = "";
+            txtPrdCodigo.Clear();
+            txtPrdNombre.Clear();
+            txtPrdDesc.Clear();
+            txtPrdPrecio.Clear();
+            txtPrdUtilidad.Clear();
+            txtPrdAltImagen.Clear();
             cmbCategoria.SelectedIndex = -1;
             cmbClasificacion.SelectedIndex = -1;
             cmbUnidad.SelectedIndex = -1;
@@ -219,8 +196,10 @@ namespace Administracion.GUI
         private bool CamposInvalidos()
         {
             return string.IsNullOrWhiteSpace(txtPrdCodigo.Text) ||
+                   string.IsNullOrWhiteSpace(txtPrdNombre.Text) ||
                    cmbCategoria.SelectedValue == null ||
-                   string.IsNullOrWhiteSpace(txtPrdNombre.Text);
+                   cmbClasificacion.SelectedValue == null ||
+                   cmbUnidad.SelectedValue == null;
         }
     }
 }

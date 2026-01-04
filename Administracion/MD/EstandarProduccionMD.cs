@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Oracle.ManagedDataAccess.Client;
 using Administracion.Datos;
 using Administracion.DP;
@@ -18,9 +15,9 @@ namespace Administracion.MD
 
             using (OracleConnection conn = OracleDB.CrearConexion())
             {
-                OracleCommand cmd = new OracleCommand(query, conn);
                 try
                 {
+                    OracleCommand cmd = new OracleCommand(query, conn);
                     conn.Open();
                     OracleDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
@@ -34,15 +31,17 @@ namespace Administracion.MD
                         });
                     }
                 }
-                catch (Exception ex) { throw new Exception("Error MD: " + ex.Message); }
+                catch (Exception ex)
+                {
+                    throw new Exception($"{OracleDB.GetConfig("error.general")} (ConsultarAllMD): {ex.Message}");
+                }
             }
             return lista;
         }
+
         public List<EstandarProduccionDP> ConsultarByCodMD(string criterio)
         {
             List<EstandarProduccionDP> lista = new List<EstandarProduccionDP>();
-
-            // SQL con LIKE para búsqueda parcial en ambas llaves
             string sql = "SELECT MTP_Codigo, PRO_Codigo, EDP_Descripcion, EDP_Cantidad " +
                          "FROM ESTANDAR_PRODUCCION " +
                          "WHERE MTP_Codigo LIKE :criterio " +
@@ -50,27 +49,32 @@ namespace Administracion.MD
 
             using (OracleConnection conn = OracleDB.CrearConexion())
             {
-                conn.Open();
-                using (OracleCommand cmd = new OracleCommand(sql, conn))
+                try
                 {
-                    // El comodín % permite buscar "que contenga" el texto
-                    string filtro = "%" + criterio + "%";
-                    cmd.Parameters.Add(":criterio", filtro);
-
-                    using (OracleDataReader dr = cmd.ExecuteReader())
+                    conn.Open();
+                    using (OracleCommand cmd = new OracleCommand(sql, conn))
                     {
-                        while (dr.Read())
+                        string filtro = "%" + criterio + "%";
+                        cmd.Parameters.Add(":criterio", filtro);
+
+                        using (OracleDataReader dr = cmd.ExecuteReader())
                         {
-                            EstandarProduccionDP estandar = new EstandarProduccionDP
+                            while (dr.Read())
                             {
-                                MtpCodigo = dr.GetString(0),
-                                ProCodigo = dr.GetString(1),
-                                EdpDescripcion = dr.IsDBNull(2) ? "" : dr.GetString(2),
-                                EdpCantidad = dr.GetDouble(3)
-                            };
-                            lista.Add(estandar);
+                                lista.Add(new EstandarProduccionDP
+                                {
+                                    MtpCodigo = dr.GetString(0),
+                                    ProCodigo = dr.GetString(1),
+                                    EdpDescripcion = dr.IsDBNull(2) ? "" : dr.GetString(2),
+                                    EdpCantidad = dr.GetDouble(3)
+                                });
+                            }
                         }
                     }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"{OracleDB.GetConfig("error.general")} (ConsultarByCodMD): {ex.Message}");
                 }
             }
             return lista;
@@ -81,13 +85,20 @@ namespace Administracion.MD
             string sql = "INSERT INTO ESTANDAR_PRODUCCION (MTP_CODIGO, PRO_CODIGO, EDP_DESCRIPCION, EDP_CANTIDAD) VALUES (:mtp, :pro, :des, :can)";
             using (OracleConnection conn = OracleDB.CrearConexion())
             {
-                OracleCommand cmd = new OracleCommand(sql, conn);
-                cmd.Parameters.Add(new OracleParameter("mtp", dp.MtpCodigo));
-                cmd.Parameters.Add(new OracleParameter("pro", dp.ProCodigo));
-                cmd.Parameters.Add(new OracleParameter("des", dp.EdpDescripcion));
-                cmd.Parameters.Add(new OracleParameter("can", dp.EdpCantidad));
-                conn.Open();
-                return cmd.ExecuteNonQuery();
+                try
+                {
+                    OracleCommand cmd = new OracleCommand(sql, conn);
+                    cmd.Parameters.Add(new OracleParameter("mtp", dp.MtpCodigo));
+                    cmd.Parameters.Add(new OracleParameter("pro", dp.ProCodigo));
+                    cmd.Parameters.Add(new OracleParameter("des", dp.EdpDescripcion));
+                    cmd.Parameters.Add(new OracleParameter("can", dp.EdpCantidad));
+                    conn.Open();
+                    return cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"{OracleDB.GetConfig("error.general")} (IngresarMD): {ex.Message}");
+                }
             }
         }
 
@@ -96,13 +107,20 @@ namespace Administracion.MD
             string sql = "UPDATE ESTANDAR_PRODUCCION SET EDP_DESCRIPCION = :des, EDP_CANTIDAD = :can WHERE MTP_CODIGO = :mtp AND PRO_CODIGO = :pro";
             using (OracleConnection conn = OracleDB.CrearConexion())
             {
-                OracleCommand cmd = new OracleCommand(sql, conn);
-                cmd.Parameters.Add(new OracleParameter("des", dp.EdpDescripcion));
-                cmd.Parameters.Add(new OracleParameter("can", dp.EdpCantidad));
-                cmd.Parameters.Add(new OracleParameter("mtp", dp.MtpCodigo));
-                cmd.Parameters.Add(new OracleParameter("pro", dp.ProCodigo));
-                conn.Open();
-                return cmd.ExecuteNonQuery();
+                try
+                {
+                    OracleCommand cmd = new OracleCommand(sql, conn);
+                    cmd.Parameters.Add(new OracleParameter("des", dp.EdpDescripcion));
+                    cmd.Parameters.Add(new OracleParameter("can", dp.EdpCantidad));
+                    cmd.Parameters.Add(new OracleParameter("mtp", dp.MtpCodigo));
+                    cmd.Parameters.Add(new OracleParameter("pro", dp.ProCodigo));
+                    conn.Open();
+                    return cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"{OracleDB.GetConfig("error.general")} (ActualizarMD): {ex.Message}");
+                }
             }
         }
 
@@ -111,11 +129,18 @@ namespace Administracion.MD
             string sql = "DELETE FROM ESTANDAR_PRODUCCION WHERE MTP_CODIGO = :mtp AND PRO_CODIGO = :pro";
             using (OracleConnection conn = OracleDB.CrearConexion())
             {
-                OracleCommand cmd = new OracleCommand(sql, conn);
-                cmd.Parameters.Add(new OracleParameter("mtp", mtp));
-                cmd.Parameters.Add(new OracleParameter("pro", pro));
-                conn.Open();
-                return cmd.ExecuteNonQuery();
+                try
+                {
+                    OracleCommand cmd = new OracleCommand(sql, conn);
+                    cmd.Parameters.Add(new OracleParameter("mtp", mtp));
+                    cmd.Parameters.Add(new OracleParameter("pro", pro));
+                    conn.Open();
+                    return cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"{OracleDB.GetConfig("error.general")} (EliminarMD): {ex.Message}");
+                }
             }
         }
     }

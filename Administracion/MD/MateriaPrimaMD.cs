@@ -1,6 +1,6 @@
 ﻿using Administracion.Datos;
 using Administracion.DP;
-using Oracle.ManagedDataAccess.Client; // Asegúrate de tener la referencia
+using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -35,10 +35,15 @@ namespace Administracion.MD
                         });
                     }
                 }
-                catch (Exception ex) { throw new Exception("Error en ConsultarAllMD: " + ex.Message); }
+                catch (Exception ex)
+                {
+                    // error.general
+                    throw new Exception($"{OracleDB.GetConfig("error.general")} (ConsultarAllMD): {ex.Message}");
+                }
             }
             return lista;
         }
+
         /* Método para consulta por parámetro (código) */
         public List<MateriaPrimaDP> ConsultarByCodMD(string codigo)
         {
@@ -66,7 +71,11 @@ namespace Administracion.MD
                         });
                     }
                 }
-                catch (Exception ex) { throw new Exception("Error en ConsultarPorCodigoMD: " + ex.Message); }
+                catch (Exception ex)
+                {
+                    // error.general
+                    throw new Exception($"{OracleDB.GetConfig("error.general")} (ConsultarByCodMD): {ex.Message}");
+                }
             }
             return lista;
         }
@@ -75,42 +84,58 @@ namespace Administracion.MD
         public int IngresarMD(MateriaPrimaDP dp)
         {
             string sql = "INSERT INTO MATERIA_PRIMA (MTP_CODIGO, UME_CODIGO, MTP_NOMBRE, MTP_DESCRIPCION, MTP_PRECIO_COMPRA_ANT, MTP_PRECIO_COMPRA) " +
-                 "VALUES (:cod, :uni, :nom, :des, :pant, :pact)";
+                         "VALUES (:cod, :uni, :nom, :des, :pant, :pact)";
 
             using (OracleConnection conn = OracleDB.CrearConexion())
             {
-                OracleCommand cmd = new OracleCommand(sql, conn);
-                cmd.Parameters.Add(new OracleParameter("cod", dp.MtpCodigo));
-                cmd.Parameters.Add(new OracleParameter("uni", dp.UmeCodigo));
-                cmd.Parameters.Add(new OracleParameter("nom", dp.MtpNombre));
-                cmd.Parameters.Add(new OracleParameter("des", dp.MtpDescripcion));
-                cmd.Parameters.Add(new OracleParameter("pant", dp.MtpPrecioCompraAnt));
-                cmd.Parameters.Add(new OracleParameter("pact", dp.MtpPrecioCompra));
+                try
+                {
+                    OracleCommand cmd = new OracleCommand(sql, conn);
+                    cmd.Parameters.Add(new OracleParameter("cod", dp.MtpCodigo));
+                    cmd.Parameters.Add(new OracleParameter("uni", dp.UmeCodigo));
+                    cmd.Parameters.Add(new OracleParameter("nom", dp.MtpNombre));
+                    cmd.Parameters.Add(new OracleParameter("des", dp.MtpDescripcion));
+                    cmd.Parameters.Add(new OracleParameter("pant", dp.MtpPrecioCompraAnt));
+                    cmd.Parameters.Add(new OracleParameter("pact", dp.MtpPrecioCompra));
 
-                conn.Open();
-                return cmd.ExecuteNonQuery();
+                    conn.Open();
+                    return cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    // error.general
+                    throw new Exception($"{OracleDB.GetConfig("error.general")} (IngresarMD): {ex.Message}");
+                }
             }
         }
+
         /* Método para actualizar materia prima */
         public int ActualizarMD(MateriaPrimaDP dp)
         {
-            /* Actualiza los datos de una materia prima existente */
             string sql = "UPDATE MATERIA_PRIMA SET UME_CODIGO = :uni, MTP_NOMBRE = :nom, " +
                          "MTP_DESCRIPCION = :des, MTP_PRECIO_COMPRA_ANT = :pant, " +
                          "MTP_PRECIO_COMPRA = :pact WHERE MTP_CODIGO = :cod";
 
             using (OracleConnection conn = OracleDB.CrearConexion())
             {
-                OracleCommand cmd = new OracleCommand(sql, conn);
-                cmd.Parameters.Add(new OracleParameter("uni", dp.UmeCodigo));
-                cmd.Parameters.Add(new OracleParameter("nom", dp.MtpNombre));
-                cmd.Parameters.Add(new OracleParameter("des", dp.MtpDescripcion));
-                cmd.Parameters.Add(new OracleParameter("pant", dp.MtpPrecioCompraAnt));
-                cmd.Parameters.Add(new OracleParameter("pact", dp.MtpPrecioCompra));
-                cmd.Parameters.Add(new OracleParameter("cod", dp.MtpCodigo));
+                try
+                {
+                    OracleCommand cmd = new OracleCommand(sql, conn);
+                    cmd.Parameters.Add(new OracleParameter("uni", dp.UmeCodigo));
+                    cmd.Parameters.Add(new OracleParameter("nom", dp.MtpNombre));
+                    cmd.Parameters.Add(new OracleParameter("des", dp.MtpDescripcion));
+                    cmd.Parameters.Add(new OracleParameter("pant", dp.MtpPrecioCompraAnt));
+                    cmd.Parameters.Add(new OracleParameter("pact", dp.MtpPrecioCompra));
+                    cmd.Parameters.Add(new OracleParameter("cod", dp.MtpCodigo));
 
-                conn.Open();
-                return cmd.ExecuteNonQuery();
+                    conn.Open();
+                    return cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    // error.general
+                    throw new Exception($"{OracleDB.GetConfig("error.general")} (ActualizarMD): {ex.Message}");
+                }
             }
         }
 
@@ -121,10 +146,18 @@ namespace Administracion.MD
 
             using (OracleConnection conn = OracleDB.CrearConexion())
             {
-                OracleCommand cmd = new OracleCommand(sql, conn);
-                cmd.Parameters.Add(new OracleParameter("cod", codigo));
-                conn.Open();
-                return cmd.ExecuteNonQuery();
+                try
+                {
+                    OracleCommand cmd = new OracleCommand(sql, conn);
+                    cmd.Parameters.Add(new OracleParameter("cod", codigo));
+                    conn.Open();
+                    return cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    // error.general
+                    throw new Exception($"{OracleDB.GetConfig("error.general")} (EliminarMD): {ex.Message}");
+                }
             }
         }
     }

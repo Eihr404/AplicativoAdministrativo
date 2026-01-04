@@ -59,5 +59,104 @@ namespace Administracion.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No se encontró el archivo de propiedades..
+        /// </summary>
+        internal static string error_archivo {
+            get {
+                return ResourceManager.GetString("error_archivo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No se pudo conectar a Oracle. Verifique la configuración..
+        /// </summary>
+        internal static string error_conexion {
+            get {
+                return ResourceManager.GetString("error_conexion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a El precio debe ser un valor numérico válido (ej: 10.50)..
+        /// </summary>
+        internal static string error_formato_numerico {
+            get {
+                return ResourceManager.GetString("error_formato_numerico", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Ocurrió un error inesperado:.
+        /// </summary>
+        internal static string error_general {
+            get {
+                return ResourceManager.GetString("error_general", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No se encontró ningún registro con el criterio solicitado..
+        /// </summary>
+        internal static string error_no_encontrado {
+            get {
+                return ResourceManager.GetString("error_no_encontrado", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Debe llenar todos los campos antes de continuar..
+        /// </summary>
+        internal static string error_validacion {
+            get {
+                return ResourceManager.GetString("error_validacion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Error al cargar los catálogos de productos..
+        /// </summary>
+        internal static string lbl_catalogo_error {
+            get {
+                return ResourceManager.GetString("lbl_catalogo_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Debe seleccionar una categoría válida..
+        /// </summary>
+        internal static string lbl_categoria_error {
+            get {
+                return ResourceManager.GetString("lbl_categoria_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a El campo código no puede estar vacío..
+        /// </summary>
+        internal static string lbl_codigo_vacio {
+            get {
+                return ResourceManager.GetString("lbl_codigo_vacio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a El porcentaje de utilidad no es válido..
+        /// </summary>
+        internal static string lbl_utilidad_error {
+            get {
+                return ResourceManager.GetString("lbl_utilidad_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Confirmar eliminación.
+        /// </summary>
+        internal static string titulo_confirmar_borrar {
+            get {
+                return ResourceManager.GetString("titulo_confirmar_borrar", resourceCulture);
+            }
+        }
     }
 }

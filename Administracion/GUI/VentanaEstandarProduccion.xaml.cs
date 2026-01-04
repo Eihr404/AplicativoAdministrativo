@@ -83,6 +83,9 @@ namespace Administracion.GUI
                     EdpCantidad = double.Parse(txtEdpCantidad.Text)
                 };
 
+                if (MessageBox.Show(OracleDB.GetConfig("mensaje.confirmacion.guardar"),
+                    OracleDB.GetConfig("titulo.confirmacion"), MessageBoxButton.YesNo) == MessageBoxResult.No) return;
+
                 int filas = esModificacion ? objeto.ActualizarDP() : objeto.InsertarDP();
 
                 if (filas > 0)

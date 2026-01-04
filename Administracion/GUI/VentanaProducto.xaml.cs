@@ -139,12 +139,11 @@ namespace Administracion.GUI
                     Descripcion = txtPrdDesc.Text.Trim(),
                     PrecioVenta = precio,
                     Utilidad = utilidad,
+                    Imagen = txtPrdImagen.Text.Trim(),
                     AltTextImagen = txtPrdAltImagen.Text.Trim(),
                     CategoriaCodigo = cmbCategoria.SelectedValue.ToString(),
                     ClasificacionCodigo = cmbClasificacion.SelectedValue.ToString(),
                     UnidadMedidaCodigo = cmbUnidad.SelectedValue.ToString(),
-                    // Atributos adicionales
-                    Imagen = "default.png", // Aquí podrías poner una ruta de imagen si tuvieras el control
                     PrecioVentaAnt = esModificacion ? productoDP.PrecioVenta : 0
                 };
 
@@ -187,6 +186,7 @@ namespace Administracion.GUI
             txtPrdDesc.Clear();
             txtPrdPrecio.Clear();
             txtPrdUtilidad.Clear();
+            txtPrdImagen.Clear();
             txtPrdAltImagen.Clear();
             cmbCategoria.SelectedIndex = -1;
             cmbClasificacion.SelectedIndex = -1;

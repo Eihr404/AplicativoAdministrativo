@@ -1,4 +1,3 @@
-﻿using Administracion.MD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +12,35 @@ namespace Administracion.DP
         public string EmpCedulaRuc { get; set; }       // EMP_CEDULA_RUC
         public string PrvNombre { get; set; }          // PRV_NOMBRE
         public string PrvTelefono { get; set; }        // PRV_TELEFONO
-        public static List<ProveedorDP> Listar()
-        {
-            ProveedorMD md = new ProveedorMD();
-            return md.Listar();
-        }
-    }
+        public string PrvDireccion { get; set; }       // PRV_DIRECCION
 
+
+        private ProveedorMD prvProveedorMD = new ProveedorMD();
+
+        public List<ProveedorDP> ObtenerProveedoresDP()
+        {            
+            return prvProveedorMD.ObtenerProveedorMD();
+        }
+
+        public List<ProveedorDP> BuscarProveedorDP(string codigoPrv)
+        {
+            return prvProveedorMD.BuscarProveedorMD(codigoPrv);
+        }
+
+        public int InsertarProveedorDP(string PrvCodigo, string PrvNombre, string PrvDireccion, string PrvTelefono) 
+        {
+            return prvProveedorMD.InsertarProveedorMD(PrvCodigo, PrvNombre, PrvDireccion, PrvTelefono);
+        }
+
+        public int ActualizarProveedorDP()
+        {
+            return prvProveedorMD.ModificarProveedorMD(this);
+        }
+
+        public int EliminarProveedorDP()
+        {
+            return prvProveedorMD.EliminarProveedorMD(this.PrvCodigo);
+        }
+
+    }
 }

@@ -6,27 +6,30 @@
         xmlns:local="clr-namespace:Administracion.GUI"
         mc:Ignorable="d"
         d:DesignHeight="600" d:DesignWidth="800">
-    <Grid Grid.Row="2" Margin="10">
+    <Grid Grid.Row="3" Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Barra superior -->
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-            <TextBox x:Name="TxtBuscar" Width="260" Margin="0,0,10,0"
-              VerticalContentAlignment="Center"
-              ToolTip="Buscar por cédula"/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10" HorizontalAlignment="Center" Grid.Row="0">
+            <StackPanel>
+                <Label Content="Ingrese el codigo del proveedor" FontSize="12" FontWeight="Bold"          HorizontalAlignment="Center"/>
+                <TextBox x:Name="TxtBuscar" Width="260" Margin="0,0,10,0"  VerticalContentAlignment="Center" ToolTip="Buscar por cédula"/>
+            </StackPanel>
+                
             <Button Content="Consultar" Width="90" Click="BtnConsultar_Click" Margin="0,0,10,0"/>
             <Button Content="Ingresar" Width="90" Click="CliBtnIngresar" Margin="0,0,10,0"/>
-            <Button Content="Eliminar" Width="90" Click="BtnToggleEstado_Click" Margin="0,0,10,0"/>
-            <Button Content="Modificar" Width="90" Click="BtnModificarRol_Click" Margin="0,0,10,0"/>
+            <Button Content="Eliminar" Width="90" Click="BtnEliminar_Click" Margin="0,0,10,0"/>
+            <Button Content="Modificar" Width="90" Click="BtnModificar_Click" Margin="0,0,10,0"/>
         </StackPanel>
 
         <!-- Tabla -->
         <DataGrid x:Name="GridProveedor"
-               Grid.Row="1"
+               Grid.Row="2"
                AutoGenerateColumns="False"
                IsReadOnly="True"
                SelectionMode="Single">

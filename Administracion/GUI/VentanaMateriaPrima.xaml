@@ -12,12 +12,15 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,10" HorizontalAlignment="Center">
-            <TextBox x:Name="mtpTxtblBuscarCodigo" Width="250" VerticalContentAlignment="Center" ToolTip="Buscar por código o nombre"/>
-            <Button x:Name="mtpBtnConsultar" Content="Consultar" Width="90" Margin="5,0,0,0" Click="mtpBtnConsultar_Click"/>
-            <Button x:Name="mtpBtnIngresar" Content="Ingresar" Width="90" Margin="5,0,0,0" Click="mtpBtnIngresar_Click"/>
-            <Button x:Name="mtpBtnModificar" Content="Modificar" Width="90" Margin="5,0,0,0" Click="mtpBtnModificar_Click"/>
-            <Button x:Name="mtpBtnEliminar" Content="Eliminar" Width="90" Margin="5,0,0,0" Click="mtpBtnEliminar_Click"/>
+        <StackPanel Grid.Row="0" Margin="0,0,0,10" HorizontalAlignment="Center">
+            <Label Content="Aquí ingrese el código para buscar:" FontSize="11" Foreground="Gray" Padding="0,0,0,2"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBox x:Name="mtpTxtblBuscarCodigo" Width="250" VerticalContentAlignment="Center" ToolTip="Buscar por código o nombre"/>
+                <Button x:Name="mtpBtnConsultar" Content="Consultar" Width="90" Margin="5,0,0,0" Click="mtpBtnConsultar_Click"/>
+                <Button x:Name="mtpBtnIngresar" Content="Ingresar" Width="90" Margin="5,0,0,0" Click="mtpBtnIngresar_Click"/>
+                <Button x:Name="mtpBtnModificar" Content="Modificar" Width="90" Margin="5,0,0,0" Click="mtpBtnModificar_Click"/>
+                <Button x:Name="mtpBtnEliminar" Content="Eliminar" Width="90" Margin="5,0,0,0" Click="mtpBtnEliminar_Click"/>
+            </StackPanel>
         </StackPanel>
 
         <DataGrid x:Name="mtpDatGri" 

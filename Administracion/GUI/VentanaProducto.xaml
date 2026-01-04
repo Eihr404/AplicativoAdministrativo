@@ -20,20 +20,46 @@
             <Button x:Name="prdBtnEliminar" Content="Eliminar" Width="90" Margin="5,0,0,0" Click="prdBtnEliminar_Click"/>
         </StackPanel>
 
-        <DataGrid x:Name="prdDatGri" Grid.Row="1" AutoGenerateColumns="False" SelectionMode="Single" IsReadOnly="True">
+        <!-- DataGrid de Productos -->
+        <DataGrid x:Name="prdDatGri" 
+          Grid.Row="1" 
+          AutoGenerateColumns="False" 
+          SelectionMode="Single" 
+          IsReadOnly="True" Height="Auto">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Código" Binding="{Binding Codigo}" Width="Auto"/>
-                <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="150"/>
-
-                <DataGridTextColumn Header="Categoría" Binding="{Binding CategoriaDescripcion}" Width="Auto"/>
-                <DataGridTextColumn Header="Clasificación" Binding="{Binding ClasificacionNombre}" Width="Auto"/>
-                <DataGridTextColumn Header="U. Medida" Binding="{Binding UnidadMedidaDescripcion}" Width="Auto"/>
-
-                <DataGridTextColumn Header="Precio" Binding="{Binding PrecioVenta, StringFormat=C2}" Width="Auto"/>
-                <DataGridTextColumn Header="Utilidad" Binding="{Binding Utilidad, StringFormat=\{0\}%}" Width="Auto"/>
-
-                <DataGridTextColumn Header="Descripción" Binding="{Binding Descripcion}" Width="200"/>
-                <DataGridTextColumn Header="Alt Imagen" Binding="{Binding AltTextImagen}" Width="Auto"/>
+                <DataGridTextColumn x:Name="prdDatGriColCodigo" Header="Código"
+                            Binding="{Binding Codigo}"
+                            Width="Auto"/>
+                <DataGridTextColumn x:Name="prdDatGriColCateg" Header="Categoría"
+            Binding="{Binding CategoriaDescripcion}"
+            Width="Auto"/>
+                <DataGridTextColumn x:Name="prdDatGriColClasificacion" Header="Clasificacion"
+            Binding="{Binding ClasificacionDescripcion}"
+            Width="Auto"/>
+                <DataGridTextColumn x:Name="prdDatGriColUniMed" Header="Unidad de medida"
+            Binding="{Binding UnidadMedidaDescripcion}"
+            Width="Auto"/>
+                <DataGridTextColumn x:Name="prdDatGriColNombre" Header="Nombre"
+            Binding="{Binding Nombre}"
+            Width="Auto"/>
+                <DataGridTextColumn x:Name="prdDatGriColDescrip" Header="Descripción"
+            Binding="{Binding Descripcion}"
+            Width="Auto"/>
+                <DataGridTextColumn x:Name="prdDatGriColPrecio" Header="Precio de venta"
+            Binding="{Binding PrecioVenta}"
+            Width="Auto"/>
+                <DataGridTextColumn x:Name="prdDatGriColPrecioAnt" Header="Precio de venta anterior"
+            Binding="{Binding PrecioVentaAnt}"
+            Width="Auto"/>
+                <DataGridTextColumn x:Name="prdDatGriColUtilidad" Header="Utilidad"
+            Binding="{Binding Utilidad}"
+            Width="Auto"/>
+                <DataGridTextColumn x:Name="prdDatGriColImagen" Header="Imagen"
+            Binding="{Binding Imagen}"
+            Width="Auto"/>
+                <DataGridTextColumn x:Name="prdDatGriColAltText" Header="Imagen - Texto alternativo"
+            Binding="{Binding AltTextImagen}"
+            Width="Auto"/>
             </DataGrid.Columns>
         </DataGrid>
 

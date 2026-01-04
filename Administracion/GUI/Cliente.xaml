@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Administracion.GUI"
         mc:Ignorable="d"
-        Height="450" Width="863">
+        d:DesignHeight="600" d:DesignWidth="800">
     <Grid Grid.Row="2" Margin="10">        
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -14,10 +14,12 @@
             </Grid.RowDefinitions>
 
             <!-- Barra superior -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <TextBox x:Name="TxtBuscar" Width="260" Margin="0,0,10,0"
-              VerticalContentAlignment="Center"
-              ToolTip="Buscar por usuario o cédula"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10" HorizontalAlignment="Center">
+                <StackPanel>
+                    <Label Content="Ingrese el usuario o cedula a buscar" FontSize="12" FontWeight="Bold"          HorizontalAlignment="Center"/>
+                    <TextBox x:Name="TxtBuscar" Width="260" Margin="0,0,10,0"  VerticalContentAlignment="Center" ToolTip="Buscar por usuario o cédula"/>
+                </StackPanel>
+            
             <Button Content="Consultar" Width="90" Click="BtnConsultar_Click" Margin="0,0,10,0"/>
             <Button Content="Ingresar" Width="90" Click="CliBtnIngresar" Margin="0,0,10,0"/>
             <Button Content="Eliminar" Width="90" Click="BtnToggleEstado_Click" Margin="0,0,10,0"/>

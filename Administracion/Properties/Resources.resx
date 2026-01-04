@@ -147,6 +147,9 @@
   <data name="lbl_utilidad_error" xml:space="preserve">
     <value>El porcentaje de utilidad no es válido.</value>
   </data>
+  <data name="mensaje_confirmacion_borrar" xml:space="preserve">
+    <value>¿Está seguro de que desea eliminar este registro?</value>
+  </data>
   <data name="titulo_confirmar_borrar" xml:space="preserve">
     <value>Confirmar eliminación</value>
   </data>

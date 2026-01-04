@@ -19,19 +19,17 @@ namespace Administracion.DP
 
         public List<ProveedorDP> ObtenerProveedoresDP()
         {            
-            ProveedorMD prvProveedorMD = new ProveedorMD();
             return prvProveedorMD.ObtenerProveedorMD();
         }
 
         public List<ProveedorDP> BuscarProveedorDP(string codigoPrv)
         {
-            ProveedorMD prvProveedorMD = new ProveedorMD();
             return prvProveedorMD.BuscarProveedorMD(codigoPrv);
         }
 
-        public int InsertarProveedorDP() 
+        public int InsertarProveedorDP(string PrvCodigo, string PrvNombre, string PrvDireccion, string PrvTelefono) 
         {
-            return prvProveedorMD.InsertarProveedorMD(this);
+            return prvProveedorMD.InsertarProveedorMD(PrvCodigo, PrvNombre, PrvDireccion, PrvTelefono);
         }
 
         public int ActualizarProveedorDP()

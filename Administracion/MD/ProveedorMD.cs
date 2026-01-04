@@ -49,7 +49,7 @@ namespace Administracion.MD
             var proveedores = new List<ProveedorDP>();
 
             const string sql = @"
-                SELECT PRV_CODIGO, PRV_NOMBRE, PRV_DIRECCION, PRV_TELEFONO 
+                SELECT PRV_CODIGO, EMP_CEDULA_RUC, PRV_NOMBRE, PRV_DIRECCION, PRV_TELEFONO 
                 FROM PROVEEDOR
                 WHERE UPPER(PRV_CODIGO) LIKE UPPER(:pTexto)                   
                 ORDER BY PRV_NOMBRE ASC";
@@ -68,9 +68,10 @@ namespace Administracion.MD
                     proveedores.Add(new ProveedorDP
                     {
                         PrvCodigo = dr.IsDBNull(0) ? "" : dr.GetString(0),
-                        PrvNombre = dr.IsDBNull(1) ? "" : dr.GetString(1),
-                        PrvDireccion = dr.IsDBNull(2) ? "" : dr.GetString(2),
-                        PrvTelefono = dr.IsDBNull(3) ? "" : dr.GetString(3)
+                        EmpCedulaRuc = dr.IsDBNull(1) ? "" : dr.GetString(1),
+                        PrvNombre = dr.IsDBNull(1) ? "" : dr.GetString(2),
+                        PrvDireccion = dr.IsDBNull(2) ? "" : dr.GetString(3),
+                        PrvTelefono = dr.IsDBNull(3) ? "" : dr.GetString(4)
                     });
                 }
             }
@@ -81,7 +82,7 @@ namespace Administracion.MD
             return proveedores;
         }
 
-        public int InsertarProveedorMD(ProveedorDP dp)
+        public int InsertarProveedorMD(string PrvCodigo, string PrvNombre, string PrvDireccion, string PrvTelefono)
         {
             string empCedulaRuc = "1790012345001";
             int filasAfectadas = 0;
@@ -93,11 +94,11 @@ namespace Administracion.MD
                 using var conn = OracleDB.CrearConexion();
                 conn.Open();
                 using var cmd = new OracleCommand(sql, conn);
-                cmd.Parameters.Add(new OracleParameter("pPrvCodigo", dp.PrvCodigo));
+                cmd.Parameters.Add(new OracleParameter("pPrvCodigo", PrvCodigo));
                 cmd.Parameters.Add(new OracleParameter("pEmpCedulaRuc", empCedulaRuc));
-                cmd.Parameters.Add(new OracleParameter("pPrvNombre", dp.PrvNombre));
-                cmd.Parameters.Add(new OracleParameter("pPrvDireccion",dp.PrvDireccion));
-                cmd.Parameters.Add(new OracleParameter("pPrvTelefono", dp.PrvTelefono));
+                cmd.Parameters.Add(new OracleParameter("pPrvNombre", PrvNombre));
+                cmd.Parameters.Add(new OracleParameter("pPrvDireccion",PrvDireccion));
+                cmd.Parameters.Add(new OracleParameter("pPrvTelefono", PrvTelefono));
                 filasAfectadas = cmd.ExecuteNonQuery();
             }
             catch (Exception ex)

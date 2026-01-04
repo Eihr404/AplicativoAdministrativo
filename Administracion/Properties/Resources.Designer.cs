@@ -151,6 +151,15 @@ namespace Administracion.Properties {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a ¿Está seguro de que desea eliminar este registro?.
+        /// </summary>
+        internal static string mensaje_confirmacion_borrar {
+            get {
+                return ResourceManager.GetString("mensaje_confirmacion_borrar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Confirmar eliminación.
         /// </summary>
         internal static string titulo_confirmar_borrar {

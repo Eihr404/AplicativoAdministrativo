@@ -12,6 +12,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Administracion.DP;
+using Administracion.Datos;
+using System.ComponentModel;
 
 namespace Administracion.GUI
 {

@@ -1,67 +1,50 @@
-﻿using Administracion.DP;
+﻿using Administracion.Datos;
+using Administracion.DP;
 using Administracion.MD;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Administracion.GUI
 {
-    /// <summary>
-    /// Lógica de interacción para VentanaProducto.xaml
-    /// </summary>
     public partial class VentanaProducto : UserControl
     {
         private ProductoDP productoDP;
+        private bool esModificacion = false;
+
         public VentanaProducto()
         {
             InitializeComponent();
             productoDP = new ProductoDP();
             CargarProductos();
+            CargarCombos();
         }
-        /* Carga todos los productos que estan dentro de la base de datos */
-        public void CargarProductos()
+
+        private void CargarProductos()
         {
             try
             {
-                prdDatGri.ItemsSource = null;
-                prdDatGri.ItemsSource = productoDP.ConsultarAllDP();
+                prdDatGri.ItemsSource = new ProductoDP().ConsultarAllDP();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error al cargar productos: " + ex.Message);
+                MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
             }
         }
-        private void prdBtnIngresar_Click(object sender, RoutedEventArgs e)
-        {
-            ProductoForm formulario = new ProductoForm();
-            formulario.Owner = Window.GetWindow(this);
 
-            if (formulario.ShowDialog() == true)
+        private void CargarCombos()
+        {
+            try
             {
-                try
-                {
-                    if (formulario.productoDP.IngresarDP())
-                    {
-                        MessageBox.Show("Producto registrado correctamente.");
-                        CargarProductos();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error al guardar: " + ex.Message);
-                }
+                // Cargamos los catálogos necesarios para el formulario
+                cmbCategoria.ItemsSource = new CategoriaDP().ConsultarTodos();
+                cmbClasificacion.ItemsSource = new ClasificacionDP().ConsultarTodos();
+                cmbUnidad.ItemsSource = new UnidadMedidaDP().ConsultarTodos();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
             }
         }
 
@@ -69,79 +52,154 @@ namespace Administracion.GUI
         {
             try
             {
-                string codigo = prdTxtblBuscarCodigo.Text.Trim();
-
-                if (string.IsNullOrEmpty(codigo))
+                string criterio = prdTxtblBuscarCodigo.Text.Trim();
+                if (string.IsNullOrEmpty(criterio))
                 {
                     CargarProductos();
                 }
                 else
                 {
-                    ProductoDP p = new ProductoDP { Codigo = codigo };
-                    ProductoDP resultado = p.ConsultarByCodDP();
-
-                    if (resultado != null)
-                        prdDatGri.ItemsSource = new List<ProductoDP> { resultado };
-                    else
-                        MessageBox.Show("No se encontró el producto.");
+                    var result = new ProductoDP { Codigo = criterio }.ConsultarByCodDP();
+                    if (result == null || result.Count == 0)
+                    {
+                        MessageBox.Show(OracleDB.GetConfig("error.no_encontrado"));
+                    }
+                    prdDatGri.ItemsSource = result;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error al consultar: " + ex.Message);
+                MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
             }
+        }
+
+        private void prdBtnIngresar_Click(object sender, RoutedEventArgs e)
+        {
+            esModificacion = false;
+            lblTituloForm.Text = OracleDB.GetConfig("titulo.formulario.nuevo");
+            LimpiarCampos();
+            txtPrdCodigo.IsEnabled = true;
+            PanelFormularioPrd.Visibility = Visibility.Visible;
         }
 
         private void prdBtnModificar_Click(object sender, RoutedEventArgs e)
         {
             if (prdDatGri.SelectedItem is not ProductoDP seleccionado)
             {
-                MessageBox.Show("Seleccione un producto.");
+                MessageBox.Show(OracleDB.GetConfig("error.no_encontrado"));
                 return;
             }
 
-            ProductoForm formulario = new ProductoForm(seleccionado);
-            formulario.Owner = Window.GetWindow(this);
+            esModificacion = true;
+            this.productoDP = seleccionado; // Guardamos la referencia para el PrecioVentaAnt
+            lblTituloForm.Text = OracleDB.GetConfig("titulo.formulario.editar");
 
-            if (formulario.ShowDialog() == true)
+            // Mapeo de atributos al formulario
+            txtPrdCodigo.Text = seleccionado.Codigo;
+            txtPrdCodigo.IsEnabled = false;
+            txtPrdNombre.Text = seleccionado.Nombre;
+            txtPrdDesc.Text = seleccionado.Descripcion;
+            txtPrdPrecio.Text = seleccionado.PrecioVenta.ToString();
+            txtPrdUtilidad.Text = seleccionado.Utilidad.ToString();
+            txtPrdAltImagen.Text = seleccionado.AltTextImagen;
+
+            // Asignación de Combos (SelectedValue usa el SelectedValuePath del XAML)
+            cmbCategoria.SelectedValue = seleccionado.CategoriaCodigo;
+            cmbClasificacion.SelectedValue = seleccionado.ClasificacionCodigo;
+            cmbUnidad.SelectedValue = seleccionado.UnidadMedidaCodigo;
+
+            PanelFormularioPrd.Visibility = Visibility.Visible;
+        }
+
+        private void BtnGuardar_Click(object sender, RoutedEventArgs e)
+        {
+            try
             {
-                try
+                if (CamposInvalidos())
                 {
-                    if (formulario.productoDP.ModificarDP())
-                    {
-                        MessageBox.Show("Producto modificado correctamente.");
-                        CargarProductos();
-                    }
+                    MessageBox.Show(OracleDB.GetConfig("error.validacion"));
+                    return;
                 }
-                catch (Exception ex)
+
+                if (!double.TryParse(txtPrdPrecio.Text, out double precio) ||
+                    !double.TryParse(txtPrdUtilidad.Text, out double utilidad))
                 {
-                    MessageBox.Show("Error al modificar: " + ex.Message);
+                    MessageBox.Show(OracleDB.GetConfig("error.formato.numerico"));
+                    return;
                 }
+
+                if (MessageBox.Show(OracleDB.GetConfig("mensaje.confirmacion.guardar"),
+                    OracleDB.GetConfig("titulo.confirmacion"), MessageBoxButton.YesNo) == MessageBoxResult.No) return;
+
+                // Creación del objeto con todos los atributos necesarios
+                ProductoDP datos = new ProductoDP
+                {
+                    Codigo = txtPrdCodigo.Text.Trim(),
+                    Nombre = txtPrdNombre.Text.Trim(),
+                    Descripcion = txtPrdDesc.Text.Trim(),
+                    PrecioVenta = precio,
+                    Utilidad = utilidad,
+                    Imagen = txtPrdImagen.Text.Trim(),
+                    AltTextImagen = txtPrdAltImagen.Text.Trim(),
+                    CategoriaCodigo = cmbCategoria.SelectedValue.ToString(),
+                    ClasificacionCodigo = cmbClasificacion.SelectedValue.ToString(),
+                    UnidadMedidaCodigo = cmbUnidad.SelectedValue.ToString(),
+                    PrecioVentaAnt = esModificacion ? productoDP.PrecioVenta : 0
+                };
+
+                bool resultado = esModificacion ? datos.ModificarDP() : datos.IngresarDP();
+
+                if (resultado)
+                {
+                    MessageBox.Show(esModificacion ? OracleDB.GetConfig("exito.actualizar") : OracleDB.GetConfig("exito.guardar"));
+                    PanelFormularioPrd.Visibility = Visibility.Collapsed;
+                    CargarProductos();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
             }
         }
 
         private void prdBtnEliminar_Click(object sender, RoutedEventArgs e)
         {
-            if (prdDatGri.SelectedItem is not ProductoDP seleccionado)
-            {
-                MessageBox.Show("Seleccione un producto para eliminar.");
-                return;
-            }
+            if (prdDatGri.SelectedItem is not ProductoDP seleccionado) return;
 
-            var resp = MessageBox.Show(
-                $"¿Desea eliminar el producto {seleccionado.Nombre}?",
-                "Confirmar eliminación",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning);
-
-            if (resp == MessageBoxResult.Yes)
+            if (MessageBox.Show(OracleDB.GetConfig("mensaje.confirmacion.borrar"),
+                OracleDB.GetConfig("titulo.confirmacion"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 if (seleccionado.EliminarDP())
                 {
-                    MessageBox.Show("Producto eliminado.");
+                    MessageBox.Show(OracleDB.GetConfig("exito.eliminar"));
                     CargarProductos();
                 }
             }
+        }
+
+        private void BtnCancelar_Click(object sender, RoutedEventArgs e) => PanelFormularioPrd.Visibility = Visibility.Collapsed;
+
+        private void LimpiarCampos()
+        {
+            txtPrdCodigo.Clear();
+            txtPrdNombre.Clear();
+            txtPrdDesc.Clear();
+            txtPrdPrecio.Clear();
+            txtPrdUtilidad.Clear();
+            txtPrdImagen.Clear();
+            txtPrdAltImagen.Clear();
+            cmbCategoria.SelectedIndex = -1;
+            cmbClasificacion.SelectedIndex = -1;
+            cmbUnidad.SelectedIndex = -1;
+        }
+
+        private bool CamposInvalidos()
+        {
+            return string.IsNullOrWhiteSpace(txtPrdCodigo.Text) ||
+                   string.IsNullOrWhiteSpace(txtPrdNombre.Text) ||
+                   cmbCategoria.SelectedValue == null ||
+                   cmbClasificacion.SelectedValue == null ||
+                   cmbUnidad.SelectedValue == null;
         }
     }
 }

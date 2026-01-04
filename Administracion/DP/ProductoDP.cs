@@ -45,7 +45,7 @@ namespace Administracion.DP
         }
 
         /* Consulta un producto por su código */
-        public ProductoDP ConsultarByCodDP()
+        public List<ProductoDP> ConsultarByCodDP()
         {
             return productoMD.ConsultarByCodMD(this.Codigo);
         }
@@ -60,22 +60,6 @@ namespace Administracion.DP
         public bool VerificarDP()
         {
             return productoMD.VerificarMD(this.Codigo);
-        }
-
-        /* Obtener todas las categorias en la base de datos para los comboBox de la interfaz */
-        public List<string> ObtenerCategoriasDP()
-        {
-            return productoMD.ObtenerCategoriasMD();
-        }
-        /* Obtener todas las clasificaciones en la base de datos para los comboBox de la interfaz */
-        public List<string> ObtenerClasificacionesDP()
-        {
-            return productoMD.ObtenerClasificacionesMD();
-        }
-        /* Obtener todas las undiades de medida en la base de datos para los comboBox de la interfaz */
-        public List<string> ObtenerUnidadesMedidaDP()
-        {
-            return productoMD.ObtenerUnidadesMedidaMD();
         }
     }
 }

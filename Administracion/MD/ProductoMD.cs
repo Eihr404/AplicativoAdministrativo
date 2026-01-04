@@ -104,9 +104,9 @@ namespace Administracion.MD
         }
 
         /* Consulta un producto por su código */
-        public ProductoDP ConsultarByCodMD(string codigo)
+        public List<ProductoDP> ConsultarByCodMD(string codigo)
         {
-            ProductoDP producto = null;
+            List<ProductoDP> producto = new List<ProductoDP>();
 
             string sql = @"
                 SELECT 
@@ -130,37 +130,45 @@ namespace Administracion.MD
                 JOIN UNIDAD_MEDIDA u ON u.UME_Codigo = p.UME_Codigo
                 WHERE p.PRO_Codigo = :codigo";
 
-            using OracleConnection conn = OracleDB.CrearConexion();
-            conn.Open();
-
-            using OracleCommand cmd = new OracleCommand(sql, conn);
-            cmd.Parameters.Add(":codigo", codigo);
-
-            using OracleDataReader dr = cmd.ExecuteReader();
-
-            if (dr.Read())
+            try
             {
-                producto = new ProductoDP
+                using (OracleConnection conn = OracleDB.CrearConexion())
                 {
-                    Codigo = dr.GetString(0),
+                    conn.Open();
+                    using (OracleCommand cmd = new OracleCommand(sql, conn))
+                    {
+                        cmd.Parameters.Add(":codigo", codigo);
 
-                    CategoriaCodigo = dr.GetString(1),
-                    CategoriaDescripcion = dr.GetString(2),
-
-                    ClasificacionCodigo = dr.GetString(3),
-                    ClasificacionDescripcion = dr.GetString(4),
-
-                    UnidadMedidaCodigo = dr.GetString(5),
-                    UnidadMedidaDescripcion = dr.GetString(6),
-
-                    Nombre = dr.GetString(7),
-                    Descripcion = dr.GetString(8),
-                    PrecioVenta = dr.GetDouble(9),
-                    PrecioVentaAnt = dr.GetDouble(10),
-                    Utilidad = dr.GetDouble(11),
-                    Imagen = dr.GetString(12),
-                    AltTextImagen = dr.GetString(13)
-                };
+                        using (OracleDataReader dr = cmd.ExecuteReader())
+                        {
+                            while (dr.Read())
+                            {
+                                producto.Add(new ProductoDP
+                                {
+                                    Codigo = dr.GetString(0),
+                                    CategoriaCodigo = dr.GetString(1),
+                                    CategoriaDescripcion = dr.GetString(2),
+                                    ClasificacionCodigo = dr.GetString(3),
+                                    ClasificacionDescripcion = dr.GetString(4),
+                                    UnidadMedidaCodigo = dr.GetString(5),
+                                    UnidadMedidaDescripcion = dr.GetString(6),
+                                    Nombre = dr.GetString(7),
+                                    Descripcion = dr.IsDBNull(8) ? "" : dr.GetString(8),
+                                    PrecioVenta = dr.GetDouble(9),
+                                    PrecioVentaAnt = dr.IsDBNull(10) ? 0 : dr.GetDouble(10),
+                                    Utilidad = dr.GetDouble(11),
+                                    Imagen = dr.IsDBNull(12) ? "" : dr.GetString(12),
+                                    AltTextImagen = dr.IsDBNull(13) ? "" : dr.GetString(13)
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Opcional: Loguear el error antes de lanzar
+                throw new Exception("Error en ConsultarByCodMD: " + ex.Message);
             }
 
             return producto;

@@ -112,11 +112,15 @@
                             <TextBox x:Name="txtPrdUtilidad"/>
                         </StackPanel>
                         <StackPanel Grid.Row="2" Grid.Column="2" Margin="5">
+                            <Label Content="Imagen del producto"/>
+                            <TextBox x:Name="txtPrdImagen"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="3" Grid.Column="3" Margin="5">
                             <Label Content="Texto Alt Imagen:"/>
                             <TextBox x:Name="txtPrdAltImagen"/>
                         </StackPanel>
-
-                        <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Margin="5">
+                        <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Margin="5">
                             <Label Content="Descripción:"/>
                             <TextBox x:Name="txtPrdDesc" Height="40" TextWrapping="Wrap"/>
                         </StackPanel>

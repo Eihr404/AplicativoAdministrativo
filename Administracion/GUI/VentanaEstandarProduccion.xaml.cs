@@ -10,113 +10,117 @@ namespace Administracion.GUI
 {
     public partial class EstandarProduccion : UserControl
     {
-        EstandarProduccionMD modelo = new EstandarProduccionMD();
+        private EstandarProduccionDP seleccionadoDP;
+        private bool esModificacion = false;
 
         public EstandarProduccion()
         {
             InitializeComponent();
             CargarDatosIniciales();
+            CargarCatalogos();
         }
 
         private void CargarDatosIniciales()
         {
             try
             {
-                EstandarProduccionDP mensajeroDP = new EstandarProduccionDP();
-                edpDatGri.ItemsSource = mensajeroDP.ConsultarAllDP();
+                edpDatGri.ItemsSource = new EstandarProduccionDP().ConsultarAllDP();
             }
-            catch (Exception ex)
+            catch (Exception ex) { MessageBox.Show("Error: " + ex.Message); }
+        }
+
+        private void CargarCatalogos()
+        {
+            try
             {
-                MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
+                // Cargamos ambos combos usando los métodos que devuelven listas (ConsultarAll / ConsultaGeneral)
+                cmbMateriaPrima.ItemsSource = new MateriaPrimaDP().ConsultarAllDP();
+                cmbProducto.ItemsSource = new ProductoDP().ConsultarAllDP();
             }
+            catch (Exception ex) { MessageBox.Show("Error en catálogos: " + ex.Message); }
+        }
+
+        private void edpBtnIngresar_Click(object sender, RoutedEventArgs e)
+        {
+            esModificacion = false;
+            LimpiarCampos();
+            cmbMateriaPrima.IsEnabled = true;
+            cmbProducto.IsEnabled = true;
+            PanelFormularioEdp.Visibility = Visibility.Visible;
+        }
+
+        private void edpBtnModificar_Click(object sender, RoutedEventArgs e)
+        {
+            seleccionadoDP = edpDatGri.SelectedItem as EstandarProduccionDP;
+            if (seleccionadoDP == null)
+            {
+                MessageBox.Show(OracleDB.GetConfig("error.validacion"));
+                return;
+            }
+
+            esModificacion = true;
+            cmbMateriaPrima.SelectedValue = seleccionadoDP.MtpCodigo;
+            cmbProducto.SelectedValue = seleccionadoDP.ProCodigo;
+            txtEdpDescripcion.Text = seleccionadoDP.EdpDescripcion;
+            txtEdpCantidad.Text = seleccionadoDP.EdpCantidad.ToString();
+
+            // Usualmente las llaves primarias compuestas no se editan
+            cmbMateriaPrima.IsEnabled = false;
+            cmbProducto.IsEnabled = false;
+
+            PanelFormularioEdp.Visibility = Visibility.Visible;
+        }
+
+        private void BtnGuardar_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                EstandarProduccionDP objeto = new EstandarProduccionDP
+                {
+                    MtpCodigo = cmbMateriaPrima.SelectedValue?.ToString(),
+                    ProCodigo = cmbProducto.SelectedValue?.ToString(),
+                    EdpDescripcion = txtEdpDescripcion.Text,
+                    EdpCantidad = double.Parse(txtEdpCantidad.Text)
+                };
+
+                int filas = esModificacion ? objeto.ActualizarDP() : objeto.InsertarDP();
+
+                if (filas > 0)
+                {
+                    MessageBox.Show(OracleDB.GetConfig(esModificacion ? "exito.actualizar" : "exito.guardar"));
+                    PanelFormularioEdp.Visibility = Visibility.Collapsed;
+                    CargarDatosIniciales();
+                }
+            }
+            catch (Exception ex) { MessageBox.Show("Error al guardar: " + ex.Message); }
         }
 
         private void edpBtnConsultar_Click(object sender, RoutedEventArgs e)
         {
             try
             {
+                string codigo = edpTxtblBuscarCodigo.Text.Trim();
                 EstandarProduccionDP mensajeroDP = new EstandarProduccionDP();
-                string textoBusqueda = edpTxtblBuscarCodigo.Text.Trim();
+                List<EstandarProduccionDP> resultados;
 
-                // Inicializamos la lista como vacía por defecto
-                List<EstandarProduccionDP> resultado = new List<EstandarProduccionDP>();
-
-                if (string.IsNullOrWhiteSpace(textoBusqueda))
+                if (string.IsNullOrEmpty(codigo))
                 {
-                    resultado = mensajeroDP.ConsultarAllDP();
+                    // Si el textbox está vacío, hacemos consulta general
+                    resultados = mensajeroDP.ConsultarAllDP();
                 }
                 else
                 {
-                    string[] partes = textoBusqueda.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                    // Solo ejecutamos la consulta si hay exactamente 2 códigos
-                    if (partes.Length == 2)
-                    {
-                        // Agregamos el objeto único a la lista para evitar el error CS0029
-                        var item = mensajeroDP.ConsultarByCodDP(partes[0], partes[1]);
-                        if (item != null) resultado.Add(item);
-                    }
+                    // Si hay texto, filtramos por coincidencias en ambas llaves
+                    // Nota: Asegúrate de tener implementado ConsultarPorCriterioDP en tu capa DP/MD
+                    resultados = mensajeroDP.ConsultarByCodDP(codigo);
                 }
 
-                edpDatGri.ItemsSource = resultado;
+                edpDatGri.ItemsSource = resultados;
 
-                if (resultado.Count == 0 && !string.IsNullOrWhiteSpace(textoBusqueda))
+                // Opcional: Avisar si no se encontró nada
+                if (resultados.Count == 0 && !string.IsNullOrEmpty(codigo))
                 {
-                    MessageBox.Show(OracleDB.GetConfig("error.no_encontrado"));
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-        }
-
-        private void edpBtnIngresar_Click(object sender, RoutedEventArgs e)
-        {
-            EstandarProduccionForm formulario = new EstandarProduccionForm();
-            formulario.Owner = Window.GetWindow(this);
-
-            if (formulario.ShowDialog() == true)
-            {
-                try
-                {
-                    if (formulario.Resultado.InsertarDP() > 0)
-                    {
-                        MessageBox.Show(OracleDB.GetConfig("exito.guardar"),
-                                        OracleDB.GetConfig("titulo.confirmacion"),
-                                        MessageBoxButton.OK, MessageBoxImage.Information);
-                        CargarDatosIniciales();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
-                }
-            }
-        }
-
-        private void edpBtnModificar_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                EstandarProduccionDP seleccionado = edpDatGri.SelectedItem as EstandarProduccionDP;
-
-                if (seleccionado == null)
-                {
-                    MessageBox.Show(OracleDB.GetConfig("error.validacion"));
-                    return;
-                }
-
-                EstandarProduccionForm formulario = new EstandarProduccionForm(seleccionado);
-                formulario.Owner = Window.GetWindow(this);
-
-                if (formulario.ShowDialog() == true)
-                {
-                    if (formulario.Resultado.ActualizarDP() > 0)
-                    {
-                        MessageBox.Show(OracleDB.GetConfig("exito.actualizar"));
-                        CargarDatosIniciales();
-                    }
+                    MessageBox.Show(OracleDB.GetConfig("error.no_encontrado"), "Información", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
@@ -127,33 +131,21 @@ namespace Administracion.GUI
 
         private void edpBtnEliminar_Click(object sender, RoutedEventArgs e)
         {
-            try
+            var item = edpDatGri.SelectedItem as EstandarProduccionDP;
+            if (item != null && MessageBox.Show("¿Eliminar?", "Confirme", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                EstandarProduccionDP seleccionado = edpDatGri.SelectedItem as EstandarProduccionDP;
-
-                if (seleccionado == null)
-                {
-                    MessageBox.Show(OracleDB.GetConfig("error.validacion"));
-                    return;
-                }
-
-                var respuesta = MessageBox.Show(OracleDB.GetConfig("mensaje.confirmacion.borrar"),
-                                               OracleDB.GetConfig("titulo.confirmacion"),
-                                               MessageBoxButton.YesNo, MessageBoxImage.Warning);
-
-                if (respuesta == MessageBoxResult.Yes)
-                {
-                    if (seleccionado.EliminarDP() > 0)
-                    {
-                        MessageBox.Show(OracleDB.GetConfig("exito.eliminar"));
-                        CargarDatosIniciales();
-                    }
-                }
+                if (item.EliminarDP() > 0) CargarDatosIniciales();
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
-            }
+        }
+
+        private void BtnCancelar_Click(object sender, RoutedEventArgs e) => PanelFormularioEdp.Visibility = Visibility.Collapsed;
+
+        private void LimpiarCampos()
+        {
+            cmbMateriaPrima.SelectedIndex = -1;
+            cmbProducto.SelectedIndex = -1;
+            txtEdpDescripcion.Text = "";
+            txtEdpCantidad.Text = "";
         }
     }
 }

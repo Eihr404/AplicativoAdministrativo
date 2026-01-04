@@ -3,50 +3,90 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Administracion.GUI"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid x:Name="mtpGrid">
+             d:DesignHeight="600" d:DesignWidth="800">
+    <Grid x:Name="mtpGrid" Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition Height="8*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Botones de acción -->
-        <StackPanel x:Name="spMateriaPrima" HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" Grid.RowSpan="1">
-            <TextBox x:Name="mtpTxtblBuscarCodigo" TextWrapping="Wrap" Width="250"/>
-            <Button x:Name="mtpBtnConsultar" Content="Consultar" Margin="5,0,0,0" Click="mtpBtnConsultar_Click"/>
-            <Button x:Name="mtpBtnIngresar" Content="Ingresar" Margin="5,0,0,0" Click="mtpBtnIngresar_Click"/>
-            <Button x:Name="mtpBtnModificar" Content="Modificar" Margin="5,0,0,0" Click="mtpBtnModificar_Click"/>
-            <Button x:Name="mtpBtnEliminar" Content="Eliminar" Margin="5,0,0,0" Click="mtpBtnEliminar_Click"/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBox x:Name="mtpTxtblBuscarCodigo" Width="250" VerticalContentAlignment="Center" ToolTip="Buscar por código o nombre"/>
+            <Button x:Name="mtpBtnConsultar" Content="Consultar" Width="90" Margin="5,0,0,0" Click="mtpBtnConsultar_Click"/>
+            <Button x:Name="mtpBtnIngresar" Content="Ingresar" Width="90" Margin="5,0,0,0" Click="mtpBtnIngresar_Click"/>
+            <Button x:Name="mtpBtnModificar" Content="Modificar" Width="90" Margin="5,0,0,0" Click="mtpBtnModificar_Click"/>
+            <Button x:Name="mtpBtnEliminar" Content="Eliminar" Width="90" Margin="5,0,0,0" Click="mtpBtnEliminar_Click"/>
         </StackPanel>
 
-        <!-- DataGrid de Materia Prima -->
         <DataGrid x:Name="mtpDatGri" 
                   Grid.Row="1" 
                   AutoGenerateColumns="False" 
                   SelectionMode="Single" 
-                  IsReadOnly="True" Height="400">
+                  IsReadOnly="True" 
+                  MinHeight="200">
             <DataGrid.Columns>
-                <DataGridTextColumn x:Name="mtpDatGriColCodigo" Header="Código"
-                                    Binding="{Binding MtpCodigo}"
-                                    Width="Auto"/>
-                <DataGridTextColumn x:Name="mtpDatGriColUniMed" Header="Unidad de medida"
-                    Binding="{Binding UmeCodigo}"
-                    Width="Auto"/>
-                <DataGridTextColumn x:Name="mtpDatGriColNombre" Header="Nombre"
-                    Binding="{Binding MtpNombre}"
-                    Width="Auto"/>
-                <DataGridTextColumn x:Name="mtpDatGriColDescrip" Header="Descripción"
-                    Binding="{Binding MtpDescripcion}"
-                    Width="Auto"/>
-                <DataGridTextColumn x:Name="mtpDatGriColPrecioAnt" Header="Precio de compra anterior"
-                    Binding="{Binding MtpPrecioCompraAnt}"
-                    Width="Auto"/>
-                <DataGridTextColumn x:Name="mtpDatGriColPrecio" Header="Precio de compra"
-                    Binding="{Binding MtpPrecioCompra}"
-                    Width="Auto"/>
+                <DataGridTextColumn Header="Código" Binding="{Binding MtpCodigo}" Width="Auto"/>
+                <DataGridTextColumn Header="U. Medida" Binding="{Binding UmeCodigo}" Width="Auto"/>
+                <DataGridTextColumn Header="Nombre" Binding="{Binding MtpNombre}" Width="150"/>
+                <DataGridTextColumn Header="Descripción" Binding="{Binding MtpDescripcion}" Width="*"/>
+                <DataGridTextColumn Header="Precio Ant." Binding="{Binding MtpPrecioCompraAnt}" Width="Auto"/>
+                <DataGridTextColumn Header="Precio Actual" Binding="{Binding MtpPrecioCompra}" Width="Auto"/>
             </DataGrid.Columns>
         </DataGrid>
+
+        <Border x:Name="PanelFormularioMtp"
+                Grid.Row="2"
+                Margin="0,10,0,0"
+                Padding="15"
+                BorderBrush="#CCC"
+                BorderThickness="1"
+                CornerRadius="6"
+                Background="#FAFAFA"
+                Visibility="Collapsed">
+            <StackPanel>
+                <TextBlock Text="DETALLE DE MATERIA PRIMA" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="5">
+                        <Label Content="Código:"/>
+                        <TextBox x:Name="TxtMtpCodigo"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="5">
+                        <Label Content="Unidad Medida:"/>
+                        <ComboBox x:Name="CmbUmeCodigo"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="5">
+                        <Label Content="Nombre:"/>
+                        <TextBox x:Name="TxtMtpNombre"/>
+                        <Label Content="Descripción:"/>
+                        <TextBox x:Name="TxtMtpDesc" Height="50" TextWrapping="Wrap" AcceptsReturn="True"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Grid.Column="0" Margin="5">
+                        <Label Content="Precio Compra:"/>
+                        <TextBox x:Name="TxtMtpPrecio"/>
+                    </StackPanel>
+                </Grid>
+
+                <UniformGrid Columns="2" Margin="0,15,0,0">
+                    <Button Content="Guardar" Margin="5" Click="BtnGuardar_Click" Background="#DFF0D8"/>
+                    <Button Content="Cancelar" Margin="5" Click="BtnCancelar_Click"/>
+                </UniformGrid>
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl>

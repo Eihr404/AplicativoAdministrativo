@@ -38,37 +38,42 @@ namespace Administracion.MD
             }
             return lista;
         }
-        public EstandarProduccionDP ConsultarByCodMD(string mtpCodigo, string proCodigo)
+        public List<EstandarProduccionDP> ConsultarByCodMD(string criterio)
         {
-            EstandarProduccionDP estandar = null;
+            List<EstandarProduccionDP> lista = new List<EstandarProduccionDP>();
+
+            // SQL con LIKE para búsqueda parcial en ambas llaves
             string sql = "SELECT MTP_Codigo, PRO_Codigo, EDP_Descripcion, EDP_Cantidad " +
-             "FROM ESTANDAR_PRODUCCION " +
-             "WHERE MTP_Codigo = :mtp AND PRO_Codigo = :pro";
+                         "FROM ESTANDAR_PRODUCCION " +
+                         "WHERE MTP_Codigo LIKE :criterio " +
+                         "OR PRO_Codigo LIKE :criterio";
 
             using (OracleConnection conn = OracleDB.CrearConexion())
             {
                 conn.Open();
                 using (OracleCommand cmd = new OracleCommand(sql, conn))
                 {
-                    cmd.Parameters.Add(":mtp", mtpCodigo);
-                    cmd.Parameters.Add(":pro", proCodigo);
+                    // El comodín % permite buscar "que contenga" el texto
+                    string filtro = "%" + criterio + "%";
+                    cmd.Parameters.Add(":criterio", filtro);
 
                     using (OracleDataReader dr = cmd.ExecuteReader())
                     {
-                        if (dr.Read())
+                        while (dr.Read())
                         {
-                            estandar = new EstandarProduccionDP
+                            EstandarProduccionDP estandar = new EstandarProduccionDP
                             {
                                 MtpCodigo = dr.GetString(0),
                                 ProCodigo = dr.GetString(1),
                                 EdpDescripcion = dr.IsDBNull(2) ? "" : dr.GetString(2),
                                 EdpCantidad = dr.GetDouble(3)
                             };
+                            lista.Add(estandar);
                         }
                     }
                 }
             }
-            return estandar;
+            return lista;
         }
 
         public int IngresarMD(EstandarProduccionDP dp)

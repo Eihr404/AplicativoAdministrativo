@@ -1,41 +1,30 @@
-﻿using Administracion.DP;
+﻿using Administracion.Datos;
+using Administracion.DP;
 using Administracion.MD;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Administracion.GUI
 {
-    /// <summary>
-    /// Lógica de interacción para VentanaProducto.xaml
-    /// </summary>
     public partial class VentanaProducto : UserControl
     {
         private ProductoDP productoDP;
+        private bool esModificacion = false;
+
         public VentanaProducto()
         {
             InitializeComponent();
             productoDP = new ProductoDP();
             CargarProductos();
+            CargarCombos();
         }
-        /* Carga todos los productos que estan dentro de la base de datos */
-        public void CargarProductos()
+
+        private void CargarProductos()
         {
             try
             {
-                prdDatGri.ItemsSource = null;
                 prdDatGri.ItemsSource = productoDP.ConsultarAllDP();
             }
             catch (Exception ex)
@@ -43,48 +32,37 @@ namespace Administracion.GUI
                 MessageBox.Show("Error al cargar productos: " + ex.Message);
             }
         }
-        /* Evento click del boton ingresar producto */
-        private void prdBtnIngresar_Click(object sender, RoutedEventArgs e)
-        {
-            ProductoForm formulario = new ProductoForm();
-            formulario.Owner = Window.GetWindow(this);
 
-            if (formulario.ShowDialog() == true)
+        private void CargarCombos()
+        {
+            try
             {
-                try
-                {
-                    if (formulario.productoDP.IngresarDP())
-                    {
-                        MessageBox.Show("Producto registrado correctamente.");
-                        CargarProductos();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error al guardar: " + ex.Message);
-                }
+                cmbCategoria.ItemsSource = new CategoriaDP().ConsultarTodos();
+                cmbClasificacion.ItemsSource = new ClasificacionDP().ConsultarTodos();
+                cmbUnidad.ItemsSource = new UnidadMedidaDP().ConsultarTodos();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error en catálogos: " + ex.Message);
             }
         }
-        /* Evento click del boton consultar producto */
+
         private void prdBtnConsultar_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                string codigo = prdTxtblBuscarCodigo.Text.Trim();
-
-                if (string.IsNullOrEmpty(codigo))
+                string criterio = prdTxtblBuscarCodigo.Text.Trim();
+                if (string.IsNullOrEmpty(criterio))
                 {
                     CargarProductos();
                 }
                 else
                 {
-                    ProductoDP p = new ProductoDP { Codigo = codigo };
-                    ProductoDP resultado = p.ConsultarByCodDP();
+                    // PASO CLAVE: Asignar el criterio al objeto que hará la consulta
+                    productoDP.Codigo = criterio;
 
-                    if (resultado != null)
-                        prdDatGri.ItemsSource = new List<ProductoDP> { resultado };
-                    else
-                        MessageBox.Show("No se encontró el producto.");
+                    // Ahora la propiedad 'this.Codigo' en el DP tendrá el valor correcto
+                    prdDatGri.ItemsSource = productoDP.ConsultarByCodDP();
                 }
             }
             catch (Exception ex)
@@ -92,7 +70,16 @@ namespace Administracion.GUI
                 MessageBox.Show("Error al consultar: " + ex.Message);
             }
         }
-        /* Evento click del boton modificar producto */
+
+        private void prdBtnIngresar_Click(object sender, RoutedEventArgs e)
+        {
+            esModificacion = false;
+            lblTituloForm.Text = "NUEVO REGISTRO DE PRODUCTO";
+            LimpiarCampos();
+            txtPrdCodigo.IsEnabled = true;
+            PanelFormularioPrd.Visibility = Visibility.Visible;
+        }
+
         private void prdBtnModificar_Click(object sender, RoutedEventArgs e)
         {
             if (prdDatGri.SelectedItem is not ProductoDP seleccionado)
@@ -101,48 +88,97 @@ namespace Administracion.GUI
                 return;
             }
 
-            ProductoForm formulario = new ProductoForm(seleccionado);
-            formulario.Owner = Window.GetWindow(this);
+            esModificacion = true;
+            productoDP = seleccionado; // Guardamos el estado actual para el PrecioVentaAnt
+            lblTituloForm.Text = "MODIFICAR PRODUCTO";
 
-            if (formulario.ShowDialog() == true)
-            {
-                try
-                {
-                    if (formulario.productoDP.ModificarDP())
-                    {
-                        MessageBox.Show("Producto modificado correctamente.");
-                        CargarProductos();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error al modificar: " + ex.Message);
-                }
-            }
+            txtPrdCodigo.Text = seleccionado.Codigo;
+            txtPrdCodigo.IsEnabled = false;
+            txtPrdNombre.Text = seleccionado.Nombre;
+            txtPrdDesc.Text = seleccionado.Descripcion;
+            txtPrdPrecio.Text = seleccionado.PrecioVenta.ToString();
+            txtPrdUtilidad.Text = seleccionado.Utilidad.ToString();
+            txtPrdAltImagen.Text = seleccionado.AltTextImagen;
+
+            cmbCategoria.SelectedValue = seleccionado.CategoriaCodigo;
+            cmbClasificacion.SelectedValue = seleccionado.ClasificacionCodigo;
+            cmbUnidad.SelectedValue = seleccionado.UnidadMedidaCodigo;
+
+            PanelFormularioPrd.Visibility = Visibility.Visible;
         }
-        /* Evento click del boton eliminar producto */
-        private void prdBtnEliminar_Click(object sender, RoutedEventArgs e)
+
+        private void BtnGuardar_Click(object sender, RoutedEventArgs e)
         {
-            if (prdDatGri.SelectedItem is not ProductoDP seleccionado)
+            try
             {
-                MessageBox.Show("Seleccione un producto para eliminar.");
-                return;
-            }
-
-            var resp = MessageBox.Show(
-                $"¿Desea eliminar el producto {seleccionado.Nombre}?",
-                "Confirmar eliminación",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning);
-
-            if (resp == MessageBoxResult.Yes)
-            {
-                if (seleccionado.EliminarDP())
+                if (CamposInvalidos())
                 {
-                    MessageBox.Show("Producto eliminado.");
+                    MessageBox.Show("Todos los campos son obligatorios.");
+                    return;
+                }
+
+                // Creamos el objeto con los datos del formulario
+                ProductoDP datos = new ProductoDP
+                {
+                    Codigo = txtPrdCodigo.Text.Trim(),
+                    Nombre = txtPrdNombre.Text.Trim(),
+                    Descripcion = txtPrdDesc.Text.Trim(),
+                    PrecioVenta = double.Parse(txtPrdPrecio.Text),
+                    Utilidad = double.Parse(txtPrdUtilidad.Text),
+                    AltTextImagen = txtPrdAltImagen.Text.Trim(),
+                    CategoriaCodigo = cmbCategoria.SelectedValue.ToString(),
+                    ClasificacionCodigo = cmbClasificacion.SelectedValue.ToString(),
+                    UnidadMedidaCodigo = cmbUnidad.SelectedValue.ToString(),
+                    // Si es modificación, el anterior es el que ya tenía el objeto productoDP
+                    PrecioVentaAnt = esModificacion ? productoDP.PrecioVenta : 0
+                };
+
+                bool resultado = esModificacion ? datos.ModificarDP() : datos.IngresarDP();
+
+                if (resultado)
+                {
+                    MessageBox.Show("Operación exitosa.");
+                    PanelFormularioPrd.Visibility = Visibility.Collapsed;
                     CargarProductos();
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al guardar: " + ex.Message);
+            }
+        }
+
+        private void prdBtnEliminar_Click(object sender, RoutedEventArgs e)
+        {
+            if (prdDatGri.SelectedItem is not ProductoDP seleccionado) return;
+
+            if (MessageBox.Show($"¿Eliminar {seleccionado.Nombre}?", "Confirmar", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                if (seleccionado.EliminarDP()) CargarProductos();
+            }
+        }
+
+        private void BtnCancelar_Click(object sender, RoutedEventArgs e)
+        {
+            PanelFormularioPrd.Visibility = Visibility.Collapsed;
+        }
+
+        private void LimpiarCampos()
+        {
+            txtPrdCodigo.Text = "";
+            txtPrdNombre.Text = "";
+            txtPrdDesc.Text = "";
+            txtPrdPrecio.Text = "";
+            txtPrdUtilidad.Text = "";
+            txtPrdAltImagen.Text = "";
+            cmbCategoria.SelectedIndex = -1;
+            cmbClasificacion.SelectedIndex = -1;
+            cmbUnidad.SelectedIndex = -1;
+        }
+
+        private bool CamposInvalidos()
+        {
+            return string.IsNullOrWhiteSpace(txtPrdCodigo.Text) || cmbCategoria.SelectedValue == null;
         }
     }
 }

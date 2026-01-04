@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Administracion.MD;
@@ -15,15 +13,32 @@ namespace Administracion.DP
         public double EdpCantidad { get; set; }
 
         // Instancia del modelo
-        EstandarProduccionMD modelo = new EstandarProduccionMD();
+        private EstandarProduccionMD modelo = new EstandarProduccionMD();
 
-        public List<EstandarProduccionDP> ConsultarAllDP() => modelo.ConsultarAllMD();
-        public EstandarProduccionDP ConsultarByCodDP(string mtpCodigo, string proCodigo)
+        public List<EstandarProduccionDP> ConsultarAllDP()
         {
-            return modelo.ConsultarByCodMD(mtpCodigo, proCodigo);
+            return modelo.ConsultarAllMD();
         }
-        public int InsertarDP() => modelo.IngresarMD(this);
-        public int ActualizarDP() => modelo.ActualizarMD(this);
-        public int EliminarDP() => modelo.EliminarMD(this.MtpCodigo, this.ProCodigo);
+
+        // Nuevo método para buscar por coincidencia en ambas llaves
+        public List<EstandarProduccionDP> ConsultarByCodDP(string criterio)
+        {
+            return modelo.ConsultarByCodMD(criterio);
+        }
+
+        public int InsertarDP()
+        {
+            return modelo.IngresarMD(this);
+        }
+
+        public int ActualizarDP()
+        {
+            return modelo.ActualizarMD(this);
+        }
+
+        public int EliminarDP()
+        {
+            return modelo.EliminarMD(this.MtpCodigo, this.ProCodigo);
+        }
     }
 }

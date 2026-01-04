@@ -45,7 +45,7 @@ namespace Administracion.DP
         }
 
         /* Consulta un producto por su código */
-        public ProductoDP ConsultarByCodDP()
+        public List<ProductoDP> ConsultarByCodDP()
         {
             return productoMD.ConsultarByCodMD(this.Codigo);
         }

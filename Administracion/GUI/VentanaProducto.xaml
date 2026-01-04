@@ -12,7 +12,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10" HorizontalAlignment="Center">
             <TextBox x:Name="prdTxtblBuscarCodigo" Width="250" VerticalContentAlignment="Center"/>
             <Button x:Name="prdBtnConsultar" Content="Consultar" Width="90" Margin="5,0,0,0" Click="prdBtnConsultar_Click"/>
             <Button x:Name="prdBtnIngresar" Content="Ingresar" Width="90" Margin="5,0,0,0" Click="prdBtnIngresar_Click"/>

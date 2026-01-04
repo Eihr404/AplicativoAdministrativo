@@ -138,25 +138,20 @@ namespace Administracion.MD
         }
 
         /**
- * Inserta un nuevo usuario.
- */
+         * Inserta un nuevo usuario.
+         */
         public int InsertarCliente(string usr, string cedula, string password, string rol)
         {
             const string sqlInsertCliente = @"
-                MERGE INTO CLIENTE c
-                USING (
-                    SELECT :cedula AS CLI_CEDULA,
-                           (SELECT EMP_CEDULA_RUC FROM EMPRESA WHERE ROWNUM = 1) AS EMP_CEDULA_RUC
-                    FROM dual
-                ) s
-                ON (c.CLI_CEDULA = s.CLI_CEDULA)
-                WHEN NOT MATCHED THEN
-                    INSERT (CLI_CEDULA, EMP_CEDULA_RUC)
-                    VALUES (s.CLI_CEDULA, s.EMP_CEDULA_RUC)";
+            INSERT INTO CLIENTE (CLI_CEDULA, EMP_CEDULA_RUC)
+            SELECT :cedula, EMP_CEDULA_RUC
+            FROM EMPRESA
+            WHERE ROWNUM = 1
+            AND NOT EXISTS (SELECT 1 FROM CLIENTE WHERE CLI_CEDULA = :cedula)";
 
-            const string sql = @"
-                INSERT INTO USUARIO_APP (USR_NOMBRE, CLI_CEDULA, USR_CONTRASENA, USR_ROL, USR_ESTADO)
-                VALUES (:usr, :cedula, :pass, :rol, 'A')";
+            const string sqlUsuario = @"
+            INSERT INTO USUARIO_APP (USR_NOMBRE, CLI_CEDULA, USR_CONTRASENA, USR_ROL, USR_ESTADO)
+            VALUES (:usr, :cedula, :pass, :rol, 'A')";
 
             using var conn = OracleDB.CrearConexion();
             conn.Open();
@@ -165,27 +160,23 @@ namespace Administracion.MD
 
             try
             {
-                // Asegurar que exista CLIENTE para esa cédula
-                using (var cmdCliente = new OracleCommand(sqlInsertCliente, conn))
-                {
-                    cmdCliente.Transaction = tx;
-                    cmdCliente.Parameters.Add(new OracleParameter("cedula", cedula));
-                    cmdCliente.ExecuteNonQuery();
-                }
+                // Insertar CLIENTE si no existe
+                using var cmdCliente = new OracleCommand(sqlInsertCliente, conn);
+                cmdCliente.Transaction = tx;
+                cmdCliente.Parameters.Add("cedula", cedula);
+                cmdCliente.ExecuteNonQuery();
 
-                // Insertar USUARIO_APP
-                using (var cmd = new OracleCommand(sql, conn))
-                {
-                    cmd.Transaction = tx;
-                    cmd.Parameters.Add(new OracleParameter("usr", usr));
-                    cmd.Parameters.Add(new OracleParameter("cedula", cedula));
-                    cmd.Parameters.Add(new OracleParameter("pass", password));
-                    cmd.Parameters.Add(new OracleParameter("rol", rol));
+                // Insertar USUARIO APP
+                using var cmdUsuario = new OracleCommand(sqlUsuario, conn);
+                cmdUsuario.Transaction = tx;
+                cmdUsuario.Parameters.Add("usr", usr);
+                cmdUsuario.Parameters.Add("cedula", cedula);
+                cmdUsuario.Parameters.Add("pass", password);
+                cmdUsuario.Parameters.Add("rol", rol);
+                cmdUsuario.ExecuteNonQuery();
 
-                    int filas = cmd.ExecuteNonQuery();
-                    tx.Commit();
-                    return filas;
-                }
+                tx.Commit();
+                return 1;
             }
             catch
             {
@@ -193,6 +184,7 @@ namespace Administracion.MD
                 throw;
             }
         }
+
 
 
     }

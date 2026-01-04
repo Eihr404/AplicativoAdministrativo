@@ -3,9 +3,7 @@ using Administracion.DP;
 using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Data;
 
 namespace Administracion.MD
 {
@@ -28,25 +26,30 @@ namespace Administracion.MD
                  :precio, :precioAnt,
                  :utilidad, :imagen, :alt)";
 
-            using OracleConnection conn = OracleDB.CrearConexion();
-            conn.Open();
+            try
+            {
+                using OracleConnection conn = OracleDB.CrearConexion();
+                conn.Open();
 
-            using OracleCommand cmd = new OracleCommand(sql, conn);
-            cmd.Parameters.Add(":codigo", p.Codigo);
+                using OracleCommand cmd = new OracleCommand(sql, conn);
+                cmd.Parameters.Add(":codigo", p.Codigo);
+                cmd.Parameters.Add(":catCodigo", p.CategoriaCodigo);
+                cmd.Parameters.Add(":claCodigo", p.ClasificacionCodigo);
+                cmd.Parameters.Add(":umeCodigo", p.UnidadMedidaCodigo);
+                cmd.Parameters.Add(":nombre", p.Nombre);
+                cmd.Parameters.Add(":descripcion", p.Descripcion);
+                cmd.Parameters.Add(":precio", p.PrecioVenta);
+                cmd.Parameters.Add(":precioAnt", p.PrecioVentaAnt);
+                cmd.Parameters.Add(":utilidad", p.Utilidad);
+                cmd.Parameters.Add(":imagen", p.Imagen);
+                cmd.Parameters.Add(":alt", p.AltTextImagen);
 
-            cmd.Parameters.Add(":catCodigo", p.CategoriaCodigo);
-            cmd.Parameters.Add(":claCodigo", p.ClasificacionCodigo);
-            cmd.Parameters.Add(":umeCodigo", p.UnidadMedidaCodigo);
-
-            cmd.Parameters.Add(":nombre", p.Nombre);
-            cmd.Parameters.Add(":descripcion", p.Descripcion);
-            cmd.Parameters.Add(":precio", p.PrecioVenta);
-            cmd.Parameters.Add(":precioAnt", p.PrecioVentaAnt);
-            cmd.Parameters.Add(":utilidad", p.Utilidad);
-            cmd.Parameters.Add(":imagen", p.Imagen);
-            cmd.Parameters.Add(":alt", p.AltTextImagen);
-
-            return cmd.ExecuteNonQuery() > 0;
+                return cmd.ExecuteNonQuery() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"{OracleDB.GetConfig("error.general")} (IngresarMD): {ex.Message}");
+            }
         }
 
         /* Modifica un producto en la base de datos */
@@ -66,24 +69,30 @@ namespace Administracion.MD
                     PRO_Alt_Imagen = :alt
                 WHERE PRO_Codigo = :codigo";
 
-            using OracleConnection conn = OracleDB.CrearConexion();
-            conn.Open();
+            try
+            {
+                using OracleConnection conn = OracleDB.CrearConexion();
+                conn.Open();
 
-            using OracleCommand cmd = new OracleCommand(sql, conn);
-            cmd.Parameters.Add(":catCodigo", p.CategoriaCodigo);
-            cmd.Parameters.Add(":claCodigo", p.ClasificacionCodigo);
-            cmd.Parameters.Add(":umeCodigo", p.UnidadMedidaCodigo);
+                using OracleCommand cmd = new OracleCommand(sql, conn);
+                cmd.Parameters.Add(":catCodigo", p.CategoriaCodigo);
+                cmd.Parameters.Add(":claCodigo", p.ClasificacionCodigo);
+                cmd.Parameters.Add(":umeCodigo", p.UnidadMedidaCodigo);
+                cmd.Parameters.Add(":nombre", p.Nombre);
+                cmd.Parameters.Add(":descripcion", p.Descripcion);
+                cmd.Parameters.Add(":precio", p.PrecioVenta);
+                cmd.Parameters.Add(":precioAnt", p.PrecioVentaAnt);
+                cmd.Parameters.Add(":utilidad", p.Utilidad);
+                cmd.Parameters.Add(":imagen", p.Imagen);
+                cmd.Parameters.Add(":alt", p.AltTextImagen);
+                cmd.Parameters.Add(":codigo", p.Codigo);
 
-            cmd.Parameters.Add(":nombre", p.Nombre);
-            cmd.Parameters.Add(":descripcion", p.Descripcion);
-            cmd.Parameters.Add(":precio", p.PrecioVenta);
-            cmd.Parameters.Add(":precioAnt", p.PrecioVentaAnt);
-            cmd.Parameters.Add(":utilidad", p.Utilidad);
-            cmd.Parameters.Add(":imagen", p.Imagen);
-            cmd.Parameters.Add(":alt", p.AltTextImagen);
-            cmd.Parameters.Add(":codigo", p.Codigo);
-
-            return cmd.ExecuteNonQuery() > 0;
+                return cmd.ExecuteNonQuery() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"{OracleDB.GetConfig("error.general")} (ModificarMD): {ex.Message}");
+            }
         }
 
         /* Elimina un producto de la base de datos */
@@ -91,39 +100,31 @@ namespace Administracion.MD
         {
             string sql = "DELETE FROM PRODUCTO WHERE PRO_Codigo = :codigo";
 
-            using OracleConnection conn = OracleDB.CrearConexion();
-            conn.Open();
+            try
+            {
+                using OracleConnection conn = OracleDB.CrearConexion();
+                conn.Open();
 
-            using OracleCommand cmd = new OracleCommand(sql, conn);
-            cmd.Parameters.Add(":codigo", codigo);
+                using OracleCommand cmd = new OracleCommand(sql, conn);
+                cmd.Parameters.Add(":codigo", codigo);
 
-            int filas = cmd.ExecuteNonQuery();
-            conn.Close();
-
-            return filas > 0;
+                int filas = cmd.ExecuteNonQuery();
+                return filas > 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"{OracleDB.GetConfig("error.general")} (EliminarMD): {ex.Message}");
+            }
         }
 
         /* Consulta un producto por su código */
         public List<ProductoDP> ConsultarByCodMD(string codigo)
         {
             List<ProductoDP> producto = new List<ProductoDP>();
-
             string sql = @"
-                SELECT 
-                    p.PRO_Codigo,
-                    c.CAT_Codigo,
-                    c.CAT_Descripcion,
-                    cl.CLA_Codigo,
-                    cl.CLA_Nombre,
-                    u.UME_Codigo,
-                    u.UME_Descripcion,
-                    p.PRO_Nombre,
-                    p.PRO_Descripcion,
-                    p.PRO_Precio_venta,
-                    p.PRO_Precio_venta_ant,
-                    p.PRO_Utilidad,
-                    p.PRO_Imagen,
-                    p.PRO_Alt_Imagen
+                SELECT p.PRO_Codigo, c.CAT_Codigo, c.CAT_Descripcion, cl.CLA_Codigo, cl.CLA_Nombre, 
+                       u.UME_Codigo, u.UME_Descripcion, p.PRO_Nombre, p.PRO_Descripcion, 
+                       p.PRO_Precio_venta, p.PRO_Precio_venta_ant, p.PRO_Utilidad, p.PRO_Imagen, p.PRO_Alt_Imagen
                 FROM PRODUCTO p
                 JOIN CATEGORIA c ON c.CAT_Codigo = p.CAT_Codigo
                 JOIN CLASIFICACION cl ON cl.CLA_Codigo = p.CLA_Codigo
@@ -132,122 +133,93 @@ namespace Administracion.MD
 
             try
             {
-                using (OracleConnection conn = OracleDB.CrearConexion())
-                {
-                    conn.Open();
-                    using (OracleCommand cmd = new OracleCommand(sql, conn))
-                    {
-                        cmd.Parameters.Add(":codigo", codigo);
+                using OracleConnection conn = OracleDB.CrearConexion();
+                conn.Open();
+                using OracleCommand cmd = new OracleCommand(sql, conn);
+                cmd.Parameters.Add(":codigo", codigo);
 
-                        using (OracleDataReader dr = cmd.ExecuteReader())
-                        {
-                            while (dr.Read())
-                            {
-                                producto.Add(new ProductoDP
-                                {
-                                    Codigo = dr.GetString(0),
-                                    CategoriaCodigo = dr.GetString(1),
-                                    CategoriaDescripcion = dr.GetString(2),
-                                    ClasificacionCodigo = dr.GetString(3),
-                                    ClasificacionDescripcion = dr.GetString(4),
-                                    UnidadMedidaCodigo = dr.GetString(5),
-                                    UnidadMedidaDescripcion = dr.GetString(6),
-                                    Nombre = dr.GetString(7),
-                                    Descripcion = dr.IsDBNull(8) ? "" : dr.GetString(8),
-                                    PrecioVenta = dr.GetDouble(9),
-                                    PrecioVentaAnt = dr.IsDBNull(10) ? 0 : dr.GetDouble(10),
-                                    Utilidad = dr.GetDouble(11),
-                                    Imagen = dr.IsDBNull(12) ? "" : dr.GetString(12),
-                                    AltTextImagen = dr.IsDBNull(13) ? "" : dr.GetString(13)
-                                });
-                            }
-                        }
-                    }
+                using OracleDataReader dr = cmd.ExecuteReader();
+                while (dr.Read())
+                {
+                    producto.Add(MapearProducto(dr));
                 }
             }
             catch (Exception ex)
             {
-                // Opcional: Loguear el error antes de lanzar
-                throw new Exception("Error en ConsultarByCodMD: " + ex.Message);
+                throw new Exception($"{OracleDB.GetConfig("error.general")} (ConsultarByCodMD): {ex.Message}");
             }
-
             return producto;
         }
 
-        /* Consulta todos los productos en la base de datos */
+        /* Consulta todos los productos */
         public List<ProductoDP> ConsultarAllMD()
         {
             List<ProductoDP> productos = new();
-
             string sql = @"
-                SELECT 
-                    p.PRO_Codigo,
-                    c.CAT_Codigo,
-                    c.CAT_Descripcion,
-                    cl.CLA_Codigo,
-                    cl.CLA_Nombre,
-                    u.UME_Codigo,
-                    u.UME_Descripcion,
-                    p.PRO_Nombre,
-                    p.PRO_Descripcion,
-                    p.PRO_Precio_venta,
-                    p.PRO_Precio_venta_ant,
-                    p.PRO_Utilidad,
-                    p.PRO_Imagen,
-                    p.PRO_Alt_Imagen
+                SELECT p.PRO_Codigo, c.CAT_Codigo, c.CAT_Descripcion, cl.CLA_Codigo, cl.CLA_Nombre, 
+                       u.UME_Codigo, u.UME_Descripcion, p.PRO_Nombre, p.PRO_Descripcion, 
+                       p.PRO_Precio_venta, p.PRO_Precio_venta_ant, p.PRO_Utilidad, p.PRO_Imagen, p.PRO_Alt_Imagen
                 FROM PRODUCTO p
                 JOIN CATEGORIA c ON c.CAT_Codigo = p.CAT_Codigo
                 JOIN CLASIFICACION cl ON cl.CLA_Codigo = p.CLA_Codigo
                 JOIN UNIDAD_MEDIDA u ON u.UME_Codigo = p.UME_Codigo";
 
-            using OracleConnection conn = OracleDB.CrearConexion();
-            conn.Open();
-
-            using OracleCommand cmd = new OracleCommand(sql, conn);
-            using OracleDataReader dr = cmd.ExecuteReader();
-
-            while (dr.Read())
+            try
             {
-                productos.Add(new ProductoDP
+                using OracleConnection conn = OracleDB.CrearConexion();
+                conn.Open();
+                using OracleCommand cmd = new OracleCommand(sql, conn);
+                using OracleDataReader dr = cmd.ExecuteReader();
+                while (dr.Read())
                 {
-                    Codigo = dr.GetString(0),
-
-                    CategoriaCodigo = dr.GetString(1),
-                    CategoriaDescripcion = dr.GetString(2),
-
-                    ClasificacionCodigo = dr.GetString(3),
-                    ClasificacionDescripcion = dr.GetString(4),
-
-                    UnidadMedidaCodigo = dr.GetString(5),
-                    UnidadMedidaDescripcion = dr.GetString(6),
-
-                    Nombre = dr.GetString(7),
-                    Descripcion = dr.GetString(8),
-                    PrecioVenta = dr.GetDouble(9),
-                    PrecioVentaAnt = dr.GetDouble(10),
-                    Utilidad = dr.GetDouble(11),
-                    Imagen = dr.GetString(12),
-                    AltTextImagen = dr.GetString(13)
-                });
+                    productos.Add(MapearProducto(dr));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"{OracleDB.GetConfig("error.general")} (ConsultarAllMD): {ex.Message}");
             }
             return productos;
         }
 
-        /* Verifica si el producto existe en la base de datos para evitar repetidos*/
+        /* Método privado para reutilizar el mapeo de datos */
+        private ProductoDP MapearProducto(OracleDataReader dr)
+        {
+            return new ProductoDP
+            {
+                Codigo = dr.GetString(0),
+                CategoriaCodigo = dr.GetString(1),
+                CategoriaDescripcion = dr.GetString(2),
+                ClasificacionCodigo = dr.GetString(3),
+                ClasificacionDescripcion = dr.GetString(4),
+                UnidadMedidaCodigo = dr.GetString(5),
+                UnidadMedidaDescripcion = dr.GetString(6),
+                Nombre = dr.GetString(7),
+                Descripcion = dr.IsDBNull(8) ? "" : dr.GetString(8),
+                PrecioVenta = dr.GetDouble(9),
+                PrecioVentaAnt = dr.IsDBNull(10) ? 0 : dr.GetDouble(10),
+                Utilidad = dr.GetDouble(11),
+                Imagen = dr.IsDBNull(12) ? "" : dr.GetString(12),
+                AltTextImagen = dr.IsDBNull(13) ? "" : dr.GetString(13)
+            };
+        }
+
+        /* Verifica si el producto existe */
         public bool VerificarMD(string codigo)
         {
             string sql = "SELECT COUNT(*) FROM PRODUCTO WHERE PRO_Codigo = :codigo";
-
-            using OracleConnection conn = OracleDB.CrearConexion();
-            conn.Open();
-
-            using OracleCommand cmd = new OracleCommand(sql, conn);
-            cmd.Parameters.Add(":codigo", codigo);
-
-            int count = Convert.ToInt32(cmd.ExecuteScalar());
-            conn.Close();
-
-            return count > 0;
+            try
+            {
+                using OracleConnection conn = OracleDB.CrearConexion();
+                conn.Open();
+                using OracleCommand cmd = new OracleCommand(sql, conn);
+                cmd.Parameters.Add(":codigo", codigo);
+                return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"{OracleDB.GetConfig("error.general")} (VerificarMD): {ex.Message}");
+            }
         }
     }
 }

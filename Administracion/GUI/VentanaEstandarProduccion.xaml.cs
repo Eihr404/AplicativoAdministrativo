@@ -26,7 +26,7 @@ namespace Administracion.GUI
             {
                 edpDatGri.ItemsSource = new EstandarProduccionDP().ConsultarAllDP();
             }
-            catch (Exception ex) { MessageBox.Show("Error: " + ex.Message); }
+            catch (Exception ex) { MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}"); }
         }
 
         private void CargarCatalogos()
@@ -37,7 +37,7 @@ namespace Administracion.GUI
                 cmbMateriaPrima.ItemsSource = new MateriaPrimaDP().ConsultarAllDP();
                 cmbProducto.ItemsSource = new ProductoDP().ConsultarAllDP();
             }
-            catch (Exception ex) { MessageBox.Show("Error en catálogos: " + ex.Message); }
+            catch (Exception ex) { MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}"); }
         }
 
         private void edpBtnIngresar_Click(object sender, RoutedEventArgs e)
@@ -132,7 +132,8 @@ namespace Administracion.GUI
         private void edpBtnEliminar_Click(object sender, RoutedEventArgs e)
         {
             var item = edpDatGri.SelectedItem as EstandarProduccionDP;
-            if (item != null && MessageBox.Show("¿Eliminar?", "Confirme", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (item != null && MessageBox.Show(OracleDB.GetConfig("mensaje.confirmacion.borrar"),
+        OracleDB.GetConfig("titulo.confirmacion"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 if (item.EliminarDP() > 0) CargarDatosIniciales();
             }

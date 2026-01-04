@@ -29,7 +29,8 @@ namespace Administracion.GUI
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error al cargar productos: " + ex.Message);
+                // error.general
+                MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
             }
         }
 
@@ -43,7 +44,8 @@ namespace Administracion.GUI
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error en catálogos: " + ex.Message);
+                // error.general
+                MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
             }
         }
 
@@ -58,23 +60,28 @@ namespace Administracion.GUI
                 }
                 else
                 {
-                    // PASO CLAVE: Asignar el criterio al objeto que hará la consulta
                     productoDP.Codigo = criterio;
+                    var resultado = productoDP.ConsultarByCodDP();
 
-                    // Ahora la propiedad 'this.Codigo' en el DP tendrá el valor correcto
-                    prdDatGri.ItemsSource = productoDP.ConsultarByCodDP();
+                    if (resultado == null || resultado.Count == 0)
+                    {
+                        // error.no_encontrado
+                        MessageBox.Show(OracleDB.GetConfig("error.no_encontrado"));
+                    }
+                    prdDatGri.ItemsSource = resultado;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error al consultar: " + ex.Message);
+                MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
             }
         }
 
         private void prdBtnIngresar_Click(object sender, RoutedEventArgs e)
         {
             esModificacion = false;
-            lblTituloForm.Text = "NUEVO REGISTRO DE PRODUCTO";
+            // titulo.formulario.nuevo
+            lblTituloForm.Text = OracleDB.GetConfig("titulo.formulario.nuevo");
             LimpiarCampos();
             txtPrdCodigo.IsEnabled = true;
             PanelFormularioPrd.Visibility = Visibility.Visible;
@@ -84,13 +91,15 @@ namespace Administracion.GUI
         {
             if (prdDatGri.SelectedItem is not ProductoDP seleccionado)
             {
-                MessageBox.Show("Seleccione un producto.");
+                // error.no_encontrado (como aviso de selección)
+                MessageBox.Show(OracleDB.GetConfig("error.no_encontrado"));
                 return;
             }
 
             esModificacion = true;
-            productoDP = seleccionado; // Guardamos el estado actual para el PrecioVentaAnt
-            lblTituloForm.Text = "MODIFICAR PRODUCTO";
+            productoDP = seleccionado;
+            // titulo.formulario.editar
+            lblTituloForm.Text = OracleDB.GetConfig("titulo.formulario.editar");
 
             txtPrdCodigo.Text = seleccionado.Codigo;
             txtPrdCodigo.IsEnabled = false;
@@ -113,23 +122,38 @@ namespace Administracion.GUI
             {
                 if (CamposInvalidos())
                 {
-                    MessageBox.Show("Todos los campos son obligatorios.");
+                    // error.validacion
+                    MessageBox.Show(OracleDB.GetConfig("error.validacion"));
                     return;
                 }
 
-                // Creamos el objeto con los datos del formulario
+                // Validación de formato numérico
+                if (!double.TryParse(txtPrdPrecio.Text, out double precio))
+                {
+                    // error.formato.numerico
+                    MessageBox.Show(OracleDB.GetConfig("error.formato.numerico"));
+                    return;
+                }
+
+                // mensaje.confirmacion.guardar
+                MessageBoxResult confirmar = MessageBox.Show(
+                    OracleDB.GetConfig("mensaje.confirmacion.guardar"),
+                    OracleDB.GetConfig("titulo.confirmacion"),
+                    MessageBoxButton.YesNo);
+
+                if (confirmar == MessageBoxResult.No) return;
+
                 ProductoDP datos = new ProductoDP
                 {
                     Codigo = txtPrdCodigo.Text.Trim(),
                     Nombre = txtPrdNombre.Text.Trim(),
                     Descripcion = txtPrdDesc.Text.Trim(),
-                    PrecioVenta = double.Parse(txtPrdPrecio.Text),
+                    PrecioVenta = precio,
                     Utilidad = double.Parse(txtPrdUtilidad.Text),
                     AltTextImagen = txtPrdAltImagen.Text.Trim(),
                     CategoriaCodigo = cmbCategoria.SelectedValue.ToString(),
                     ClasificacionCodigo = cmbClasificacion.SelectedValue.ToString(),
                     UnidadMedidaCodigo = cmbUnidad.SelectedValue.ToString(),
-                    // Si es modificación, el anterior es el que ya tenía el objeto productoDP
                     PrecioVentaAnt = esModificacion ? productoDP.PrecioVenta : 0
                 };
 
@@ -137,14 +161,19 @@ namespace Administracion.GUI
 
                 if (resultado)
                 {
-                    MessageBox.Show("Operación exitosa.");
+                    // exito.guardar / exito.actualizar
+                    string msgExito = esModificacion ?
+                        OracleDB.GetConfig("exito.actualizar") :
+                        OracleDB.GetConfig("exito.guardar");
+
+                    MessageBox.Show(msgExito);
                     PanelFormularioPrd.Visibility = Visibility.Collapsed;
                     CargarProductos();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error al guardar: " + ex.Message);
+                MessageBox.Show($"{OracleDB.GetConfig("error.general")} {ex.Message}");
             }
         }
 
@@ -152,9 +181,20 @@ namespace Administracion.GUI
         {
             if (prdDatGri.SelectedItem is not ProductoDP seleccionado) return;
 
-            if (MessageBox.Show($"¿Eliminar {seleccionado.Nombre}?", "Confirmar", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            // mensaje.confirmacion.borrar
+            MessageBoxResult confirmar = MessageBox.Show(
+                OracleDB.GetConfig("mensaje.confirmacion.borrar"),
+                OracleDB.GetConfig("titulo.confirmacion"),
+                MessageBoxButton.YesNo);
+
+            if (confirmar == MessageBoxResult.Yes)
             {
-                if (seleccionado.EliminarDP()) CargarProductos();
+                if (seleccionado.EliminarDP())
+                {
+                    // exito.eliminar
+                    MessageBox.Show(OracleDB.GetConfig("exito.eliminar"));
+                    CargarProductos();
+                }
             }
         }
 
@@ -178,7 +218,9 @@ namespace Administracion.GUI
 
         private bool CamposInvalidos()
         {
-            return string.IsNullOrWhiteSpace(txtPrdCodigo.Text) || cmbCategoria.SelectedValue == null;
+            return string.IsNullOrWhiteSpace(txtPrdCodigo.Text) ||
+                   cmbCategoria.SelectedValue == null ||
+                   string.IsNullOrWhiteSpace(txtPrdNombre.Text);
         }
     }
 }

@@ -28,38 +28,50 @@
           IsReadOnly="True" Height="Auto">
             <DataGrid.Columns>
                 <DataGridTextColumn x:Name="prdDatGriColCodigo" Header="Código"
-                            Binding="{Binding Codigo}"
-                            Width="Auto"/>
+                                    Binding="{Binding Codigo}"
+                                    Width="Auto"/>
                 <DataGridTextColumn x:Name="prdDatGriColCateg" Header="Categoría"
-            Binding="{Binding CategoriaDescripcion}"
-            Width="Auto"/>
+                                    Binding="{Binding CategoriaDescripcion}"
+                                    Width="Auto"/>
                 <DataGridTextColumn x:Name="prdDatGriColClasificacion" Header="Clasificacion"
-            Binding="{Binding ClasificacionDescripcion}"
-            Width="Auto"/>
+                                    Binding="{Binding ClasificacionDescripcion}"
+                                    Width="Auto"/>
                 <DataGridTextColumn x:Name="prdDatGriColUniMed" Header="Unidad de medida"
-            Binding="{Binding UnidadMedidaDescripcion}"
-            Width="Auto"/>
+                                    Binding="{Binding UnidadMedidaDescripcion}"
+                                    Width="Auto"/>
                 <DataGridTextColumn x:Name="prdDatGriColNombre" Header="Nombre"
-            Binding="{Binding Nombre}"
-            Width="Auto"/>
+                                    Binding="{Binding Nombre}"
+                                    Width="Auto"/>
                 <DataGridTextColumn x:Name="prdDatGriColDescrip" Header="Descripción"
-            Binding="{Binding Descripcion}"
-            Width="Auto"/>
+                                    Binding="{Binding Descripcion}"
+                                    Width="Auto">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="WrapWithOverflow"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
                 <DataGridTextColumn x:Name="prdDatGriColPrecio" Header="Precio de venta"
-            Binding="{Binding PrecioVenta}"
-            Width="Auto"/>
+                                    Binding="{Binding PrecioVenta}"
+                                    Width="Auto"/>
                 <DataGridTextColumn x:Name="prdDatGriColPrecioAnt" Header="Precio de venta anterior"
-            Binding="{Binding PrecioVentaAnt}"
-            Width="Auto"/>
+                                    Binding="{Binding PrecioVentaAnt}"
+                                    Width="Auto"/>
                 <DataGridTextColumn x:Name="prdDatGriColUtilidad" Header="Utilidad"
-            Binding="{Binding Utilidad}"
-            Width="Auto"/>
+                                    Binding="{Binding Utilidad}"
+                                    Width="Auto"/>
                 <DataGridTextColumn x:Name="prdDatGriColImagen" Header="Imagen"
-            Binding="{Binding Imagen}"
-            Width="Auto"/>
+                                    Binding="{Binding Imagen}"
+                                    Width="Auto"/>
                 <DataGridTextColumn x:Name="prdDatGriColAltText" Header="Imagen - Texto alternativo"
-            Binding="{Binding AltTextImagen}"
-            Width="Auto"/>
+                                    Binding="{Binding AltTextImagen}"
+                                    Width="Auto">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="WrapWithOverflow"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
 

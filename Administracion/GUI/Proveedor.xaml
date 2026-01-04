@@ -25,24 +25,26 @@
             <DataGrid.Columns>
                 <DataGridTextColumn
                     Header="ID"
-                    Binding="{Binding IdProveedor}"
+                    Binding="{Binding PrvCodigo}"
                     Width="Auto"/>
 
                 <DataGridTextColumn
                     Header="Nombre"
-                    Binding="{Binding Nombre}"
+                    Binding="{Binding PrvNombre}"
                     Width="*"/>
 
                 <DataGridTextColumn
                     Header="RUC"
-                    Binding="{Binding Ruc}"
+                    Binding="{Binding EmpCedulaRuc}"
                     Width="*"/>
 
                 <DataGridTextColumn
                     Header="Teléfono"
-                    Binding="{Binding Telefono}"
+                    Binding="{Binding PrvTelefono}"
                     Width="*"/>
+
             </DataGrid.Columns>
+
         </DataGrid>
 
         <!-- Botones de acción -->

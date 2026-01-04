@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Administracion.MD;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,5 +14,11 @@ namespace Administracion.DP
         public string PrvNombre { get; set; }          // PRV_NOMBRE
         public string PrvDireccion { get; set; }       // PRV_DIRECCION
         public string PrvTelefono { get; set; }        // PRV_TELEFONO
+        public static List<ProveedorDP> Listar()
+        {
+            ProveedorMD md = new ProveedorMD();
+            return md.Listar();
+        }
     }
+
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Administracion.DP;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,9 +23,25 @@ namespace Administracion.GUI
         public Proveedor()
         {
             InitializeComponent();
+            CargarProveedores();
         }
-     
 
-        
+        private void CargarProveedores()
+        {
+            try
+            {
+                List<ProveedorDP> lista = ProveedorDP.Listar();
+                dgProveedores.ItemsSource = lista;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Error al cargar proveedores:\n" + ex.Message,
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+            }
+        }
     }
 }

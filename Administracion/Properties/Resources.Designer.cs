@@ -61,6 +61,15 @@ namespace Administracion.Properties {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Cliente ingresado correctamente al sistema.
+        /// </summary>
+        internal static string ClienteInsertadoOK {
+            get {
+                return ResourceManager.GetString("ClienteInsertadoOK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a No se encontró el archivo de propiedades..
         /// </summary>
         internal static string error_archivo {
@@ -111,6 +120,15 @@ namespace Administracion.Properties {
         internal static string error_validacion {
             get {
                 return ResourceManager.GetString("error_validacion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Error en el proceso de ingreso del cliente.
+        /// </summary>
+        internal static string ErrorInsertarCliente {
+            get {
+                return ResourceManager.GetString("ErrorInsertarCliente", resourceCulture);
             }
         }
         

@@ -145,8 +145,11 @@ namespace Administracion.GUI
                     ((ComboBoxItem)CmbRol.SelectedItem).Content.ToString()
                 );
 
+                MessageBox.Show(Properties.Resources.ClienteInsertadoOK,"Éxito");
+
                 PanelNuevoCliente.Visibility = Visibility.Collapsed;
                 CargarClientes();
+                LimpiarFormulario();
             }
             catch (Exception ex)
             {
